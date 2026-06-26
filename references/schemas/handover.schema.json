@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/anomalyco/ai-handover/schemas/handover.schema.json",
+  "title": "AI Handover v4.0 Execution Record",
+  "description": "Validates the YAML frontmatter of AI handover execution records",
+  "type": "object",
+  "required": [
+    "handover_id",
+    "agent_id",
+    "agent_role",
+    "coding_agent",
+    "model",
+    "status",
+    "files_modified",
+    "verification"
+  ],
+  "properties": {
+    "handover_id": {
+      "type": "string",
+      "pattern": "^\\d{8}_\\d{6}_.+$",
+      "description": "Format: YYYYMMDD_HHmmss_description"
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_role": {
+      "type": "string",
+      "enum": ["primary", "orchestrator", "worker", "reviewer", "validator"]
+    },
+    "coding_agent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "in-progress",
+        "needs-review",
+        "ready-for-merge",
+        "resolved",
+        "blocked",
+        "changes-requested",
+        "cancelled"
+      ]
+    },
+    "handover_type": {
+      "type": "string",
+      "enum": ["handover", "progress", "decision"]
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["feature", "fix", "refactor", "docs", "research", "review"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "task_description": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time string"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time string"
+    },
+    "parent_id": {
+      "type": "string",
+      "pattern": "^\\d{8}_\\d{6}_.+$",
+      "description": "Reference to parent handover_id for nested/sub-tasks"
+    },
+    "working_branch": {
+      "type": "string"
+    },
+    "files_modified": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^.+:.+$",
+        "description": "Format: cmd:status (e.g. npm run lint:pass)"
+      },
+      "minItems": 0
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "description"],
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rejected_alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notify": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["to", "via", "message"],
+        "properties": {
+          "to": {
+            "type": "string",
+            "minLength": 1
+          },
+          "via": {
+            "type": "string",
+            "enum": ["slack", "discord", "inbox"]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}

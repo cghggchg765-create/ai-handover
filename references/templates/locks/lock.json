@@ -1,0 +1,23 @@
+{
+  "__note": {
+    "version": "1.0",
+    "description": "File lock template for parallel agent coordination. ",
+    "held_by": "Agent that currently holds the lock. Format: <role>@<session>, e.g. coder-a@build",
+    "since": "ISO 8601 timestamp when the lock was acquired",
+    "task_id": "Associated task ID",
+    "files": "Array of file paths that are locked under this record. An agent may lock multiple files in one lock record if they are part of the same atomic change.",
+    "status": "in_progress — lock is active, agent is working. waiting — agent is waiting but has not released the lock. released — agent has finished and released the lock.",
+    "heartbeat": "ISO 8601 timestamp of the most recent heartbeat. Updated every heartbeat_interval_seconds to prove the agent is still alive.",
+    "stale_timeout": "If current_time - heartbeat > stale_timeout_minutes, the lock is considered stale and may be reclaimed by build."
+  },
+  "held_by": "coder-a@build",
+  "since": "2026-06-26T07:30:00Z",
+  "task_id": "T-2026-06-26-002",
+  "files": [
+    "src/components/Login.tsx",
+    "src/components/LoginForm.tsx",
+    "src/styles/login.css"
+  ],
+  "status": "in_progress",
+  "heartbeat": "2026-06-26T07:35:00Z"
+}

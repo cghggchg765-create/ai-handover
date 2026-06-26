@@ -1,0 +1,42 @@
+{
+  "version": "1",
+  "handover_dir": "AI交接记录",
+  "webhooks": {
+    "slack": "",
+    "discord": ""
+  },
+  "relay_rules": {
+    "min_priority": "normal",
+    "filter_types": ["review_request", "blocker_raised"]
+  },
+  "locks": {
+    "dir": ".ai-handover/locks",
+    "stale_timeout_minutes": 30,
+    "heartbeat_interval_seconds": 300
+  },
+  "validation": {
+    "strict_mode": true,
+    "required_checks": [
+      "exec_record",
+      "yaml_fields",
+      "prev_handover_id",
+      "git_trailers",
+      "lane_status",
+      "file_locks",
+      "hot_md_updated",
+      "next_action_format"
+    ],
+    "reject_on_failure": true
+  },
+  "slas": {
+    "heartbeat_seconds": 60,
+    "idle_reclaim_seconds": 120,
+    "task_timeout_minutes": 30,
+    "review_turnaround_minutes": 15
+  },
+  "agent_defaults": {
+    "branch_prefix": "agent-",
+    "require_trailers": true,
+    "require_file_locks": true
+  }
+}

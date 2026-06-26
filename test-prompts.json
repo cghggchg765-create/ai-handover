@@ -13,5 +13,65 @@
     "id": 3,
     "prompt": "我让子agent去写一个数据处理脚本，但它返回了空结果——什么都没做。我应该怎么办？",
     "expected": "明确指出调用方禁止自己动手修改，应重新委托/简化任务重试/换执行方，连续失败则升级"
+  },
+  {
+    "id": 4,
+    "prompt": "我作为coder agent完成了一个数据库迁移任务，修改了schema.sql和migrate.py，需要把交接记录写给reviewer agent。先创建带YAML frontmatter的执行记录，然后把任务lane从in-progress更新为needs-review，再向reviewer发送一条inbox消息，最后更新索引。",
+    "expected": "验证4个检查点：(1) 执行记录含完整YAML frontmatter (title/agent/type/status/lane/tags) (2) lane状态从in-progress变更为needs-review (3) inbox.jsonl中有一条目标为reviewer的消息 (4) 索引已更新"
+  },
+  {
+    "id": 5,
+    "prompt": "我作为reviewer agent在inbox.jsonl中收到了一条类型为review_request的消息，指向coder刚完成的交接记录目录。我需要先读取handover目录中的执行记录，然后分析代码变更，将评审意见写入执行记录同级目录的review-response.md，并将该消息的状态从pending改为resolved。",
+    "expected": "验证消息链：(1) reviewer正确读取了交接记录 (2) 生成了review-response.md包含评分和修改建议 (3) inbox.jsonl中对应消息的status从pending变为resolved (4) 评审意见中引用了原始交接记录目录路径"
+  },
+  {
+    "id": 6,
+    "prompt": "我是一个agent，当前我的任务lane状态是in-progress，但我想直接把它标记为resolved，跳过needs-review步骤。我试着直接更新lane状态。",
+    "expected": "系统应检测到非法状态迁移：in-progress → resolved（跳过needs-review）。应输出警告信息并拒绝此次状态变更，提示正确的状态流转路径为：in-progress → needs-review → resolved"
+  },
+  {
+    "id": 7,
+    "prompt": "我完成了一个API限流bug的修复，修改了rate_limiter.py和middleware.py。现在要创建一个git提交，使用commit trailers记录以下元信息：使用的编码agent是glm-5.2，模型版本为v4.0，约束条件是必须兼容Python 3.8+，以及拒绝了Redis方案（因为不想引入新依赖）。",
+    "expected": "验证commit trailers：(1) Coding-Agent trailer存在且值为glm-5.2 (2) Model trailer存在且值为v4.0 (3) Constraint trailer存在且包含Python 3.8+ (4) Rejected-Alternatives trailer存在且提及Redis (5) trailer格式符合git trailer规范"
+  },
+  {
+    "id": 8,
+    "prompt": "我在做代码审查时发现了一个新的bug模式——SQL注入发生在f-string拼接查询字符串中。这不在现有的wiki/bugs.md里。我需要记录这次任务交接，同时把这个新发现的bug模式添加到wiki/bugs.md，如果这个模式是高频发生的还需要更新wiki/hot.md。",
+    "expected": "验证wiki更新：(1) 交接记录正常生成 (2) wiki/bugs.md中新增了SQL注入f-string模式的条目，包含描述、示例和修复建议 (3) 如果判断为高频模式，wiki/hot.md中也包含对应条目 (4) wiki文件的格式与现有条目一致"
+  },
+  {
+    "id": 9,
+    "prompt": "我作为一个子agent刚完成了一项任务，修改了3个文件。我没有写任何交接记录，直接返回\"任务完成\"结果给调用方。调用方会有什么反应？",
+    "expected": "IRON RULE #1 触发：调用方拒绝接受返回结果，责令必须写AI交接记录，标记任务未完成。子agent必须补写交接记录（含执行记录+索引更新）后才能被接受。"
+  },
+  {
+    "id": 10,
+    "prompt": "我写了一份AI交接记录，YAML frontmatter中只有title和status两个字段，缺少agent、agent_version、type、lane、created_at、tags、revisions等必填字段。这份记录能被接受吗？",
+    "expected": "IRON RULE #2 触发：调用方拒绝接受，列出缺失的必填字段（agent、agent_version、type、lane、created_at、tags、revisions），责令按照YAML Schema模板重写。重写完成后才可标记任务完成。"
+  },
+  {
+    "id": 11,
+    "prompt": "我完成了一次代码提交，在commit message末尾使用了\"Co-authored-by: coder <agent@ai-handover>\"来代替标准的Coding-Agent和Model trailers。提交信息中没有Coding-Agent、Model、Constraint、Rejected-Alternatives等trailer。validate.sh会通过吗？",
+    "expected": "IRON RULE #3 触发：validate.sh检测到缺少必填的Coding-Agent和Model trailers，git commit被拒绝。必须补全4个强制trailer（Coding-Agent、Model、Constraint、Rejected-Alternatives）后才能通过。Co-authored-by不能替代标准trailer。"
+  },
+  {
+    "id": 12,
+    "prompt": "我当前的任务lane状态是in-progress，任务已经完成，我想直接把它更新为resolved，跳过needs-review审查阶段。validate.sh会接受这次状态变更吗？",
+    "expected": "IRON RULE #5 触发：validate.sh检测到非法状态跳转（in-progress → resolved），拒绝本次变更并输出警告，提示正确的流转路径为in-progress → needs-review → resolved。lane状态回退到needs-review。"
+  },
+  {
+    "id": 13,
+    "prompt": "两个并行Agent（agent-A和agent-B）同时被分派去修改同一个文件src/config.yaml。两者都没有声明文件锁。第一个Agent开始写入，第二个Agent也同时开始写入。系统应如何处理？",
+    "expected": "IRON RULE #6 触发：第一个Agent正常获取文件锁并开始写入。第二个Agent检测到文件已被锁定，被阻塞并输出警告。如果第二个Agent强行写入，触发冲突标记，文件进入conflict状态。正确的做法：第二个Agent应先检查文件锁状态，等待锁释放后再写入。"
+  },
+  {
+    "id": 14,
+    "prompt": "三个Agent串行工作在一个功能开发任务上：Agent A（coder-001）实现功能 → Agent B（reviewer-001）审查代码 → Agent C（fixer-001）修复问题。每个Agent完成工作后都需要创建交接记录并指向上一个Agent的交接记录。最终形成一个完整的交接链。如何验证链的完整性？",
+    "expected": "跨任务链测试：验证3个Agent的交接链完整无断裂。检查点：(1) Agent A的交接记录存在且prev_handover_id为null (2) Agent B的交接记录存在且prev_handover_id指向Agent A的记录 (3) Agent C的交接记录存在且prev_handover_id指向Agent B的记录 (4) 索引.md中按时间顺序记录了3条记录 (5) 任意链路断裂时系统应检测并报警。"
+  },
+  {
+    "id": 15,
+    "prompt": "我是一个新进入项目的Agent，之前没有任何该项目的历史记录。项目经理让我开始处理一个已有交接记录的项目。我应当如何开始工作？",
+    "expected": "IRON RULE #8 入职流程触发：新Agent必须按顺序执行入职恢复步骤——(1) 先读hot.md了解项目热点 (2) 读索引.md了解项目全貌 (3) 检查锁状态（.locks/目录） (4) 读active.md了解当前活跃任务 (5) 读messages获取待处理消息。如果跳过上述步骤直接动手操作，视为违规。"
   }
 ]
