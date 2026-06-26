@@ -88,6 +88,9 @@ if [ -z "$HANDOVER_ID" ]; then
   exit 1
 fi
 
+[ -z "$CODING_AGENT" ] && { echo "ERROR: --coding-agent is required" >&2; exit 1; }
+[ -z "$MODEL" ] && { echo "ERROR: --model is required" >&2; exit 1; }
+
 if [ -z "$MESSAGE" ]; then
   echo "ERROR: --message is required" >&2
   exit 1

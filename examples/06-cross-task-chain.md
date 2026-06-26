@@ -24,11 +24,7 @@ task_type: "test"
 handover_type: "handover"
 
 # === 链 — 跨任务引用（IRON RULE #4）===
-prev_handover_id:
-  - "2026-06-28_080000_init-project"    # Task 1: 初始化项目结构
-  - "2026-06-28_083000_impl-auth"       # Task 2: 实现 auth 模块
-  - "2026-06-28_090000_review-auth"     # Task 3: 审查 auth 模块
-  - "2026-06-28_093000_fix-auth"        # Task 4: 修复审查问题
+prev_handover_id: "2026-06-28_080000_init-project,2026-06-28_083000_impl-auth,2026-06-28_090000_review-auth,2026-06-28_093000_fix-auth"
 
 # === 状态机 ===
 status: "completed"
@@ -45,6 +41,7 @@ files_added:
   - "src/auth/__tests__/auth-security.test.ts"
   - "tests/integration/auth-flow.test.ts"
 files_deleted: []
+lock_files: []
 verification:
   - "npm test -- --coverage:pass (98%)"
   - "npm run typecheck:pass"

@@ -3,3 +3,4 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2026-06-24T16:45	5794f81	ai-handover	74.5	78.7	keep	dim3+dim4	集中式if-then表+3处检查点	dry_run
 2026-06-24T16:50	b743a5d	ai-handover	78.7	79.4	keep	dim1	精简frontmatter+版本号一致性	dry_run
 2026-06-26T14:00	v4.0	ai-handover	79.4	-	baseline	v4.0	多Agent协作完整升级（YAML+三层记忆+Lane+GitTrailers）	planned
+2026-06-26T17:00	94d3ec8	ai-handover	79.4	-	baseline	v4.1	IRON RULE强制合规系统 + 9条铁律 + 跨任务/串行/并行Agent协调 + 33文件修复审计	pending_review

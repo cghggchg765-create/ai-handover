@@ -17,7 +17,7 @@
   {
     "id": 4,
     "prompt": "我作为coder agent完成了一个数据库迁移任务，修改了schema.sql和migrate.py，需要把交接记录写给reviewer agent。先创建带YAML frontmatter的执行记录，然后把任务lane从in-progress更新为needs-review，再向reviewer发送一条inbox消息，最后更新索引。",
-    "expected": "验证4个检查点：(1) 执行记录含完整YAML frontmatter (title/agent/type/status/lane/tags) (2) lane状态从in-progress变更为needs-review (3) inbox.jsonl中有一条目标为reviewer的消息 (4) 索引已更新"
+    "expected": "验证4个检查点：(1) 执行记录含完整YAML frontmatter (handover_id/agent_id/coding_agent/model/status/files_modified/verification/next_action/lock_files) (2) lane状态从in-progress变更为needs-review (3) inbox.jsonl中有一条目标为reviewer的消息 (4) 索引已更新"
   },
   {
     "id": 5,
@@ -27,12 +27,12 @@
   {
     "id": 6,
     "prompt": "我是一个agent，当前我的任务lane状态是in-progress，但我想直接把它标记为resolved，跳过needs-review步骤。我试着直接更新lane状态。",
-    "expected": "系统应检测到非法状态迁移：in-progress → resolved（跳过needs-review）。应输出警告信息并拒绝此次状态变更，提示正确的状态流转路径为：in-progress → needs-review → resolved"
+    "expected": "系统应检测到非法状态迁移：in-progress → resolved（跳过needs-review）。应输出警告信息并拒绝此次状态变更，提示正确的状态流转路径为：in-progress → needs-review → ready-for-merge → resolved"
   },
   {
     "id": 7,
-    "prompt": "我完成了一个API限流bug的修复，修改了rate_limiter.py和middleware.py。现在要创建一个git提交，使用commit trailers记录以下元信息：使用的编码agent是glm-5.2，模型版本为v4.0，约束条件是必须兼容Python 3.8+，以及拒绝了Redis方案（因为不想引入新依赖）。",
-    "expected": "验证commit trailers：(1) Coding-Agent trailer存在且值为glm-5.2 (2) Model trailer存在且值为v4.0 (3) Constraint trailer存在且包含Python 3.8+ (4) Rejected-Alternatives trailer存在且提及Redis (5) trailer格式符合git trailer规范"
+    "prompt": "我完成了一个API限流bug的修复，修改了rate_limiter.py和middleware.py。现在要创建一个git提交，使用commit trailers记录以下元信息：handover_id为2026-06-26_143052_user-auth，使用的编码agent是OpenCode v1.2.3，模型为claude-opus-4-6。",
+    "expected": "验证commit trailers：(1) Handover-Id trailer存在且值为2026-06-26_143052_user-auth (2) Coding-Agent trailer存在且值为OpenCode v1.2.3 (3) Model trailer存在且值为claude-opus-4-6 (4) trailer格式符合git trailer规范"
   },
   {
     "id": 8,
@@ -46,18 +46,18 @@
   },
   {
     "id": 10,
-    "prompt": "我写了一份AI交接记录，YAML frontmatter中只有title和status两个字段，缺少agent、agent_version、type、lane、created_at、tags、revisions等必填字段。这份记录能被接受吗？",
-    "expected": "IRON RULE #2 触发：调用方拒绝接受，列出缺失的必填字段（agent、agent_version、type、lane、created_at、tags、revisions），责令按照YAML Schema模板重写。重写完成后才可标记任务完成。"
+    "prompt": "我写了一份AI交接记录，YAML frontmatter中只有handover_id和status两个字段，缺少agent_id、agent_role、coding_agent、model、branch、files_modified、verification、lock_files、next_action等必填字段。这份记录能被接受吗？",
+    "expected": "IRON RULE #2 触发：调用方拒绝接受，列出缺失的必填字段（agent_id、agent_role、coding_agent、model、branch、files_modified、verification、lock_files、next_action），责令按照YAML Schema模板重写。重写完成后才可标记任务完成。"
   },
   {
     "id": 11,
-    "prompt": "我完成了一次代码提交，在commit message末尾使用了\"Co-authored-by: coder <agent@ai-handover>\"来代替标准的Coding-Agent和Model trailers。提交信息中没有Coding-Agent、Model、Constraint、Rejected-Alternatives等trailer。validate.sh会通过吗？",
-    "expected": "IRON RULE #3 触发：validate.sh检测到缺少必填的Coding-Agent和Model trailers，git commit被拒绝。必须补全4个强制trailer（Coding-Agent、Model、Constraint、Rejected-Alternatives）后才能通过。Co-authored-by不能替代标准trailer。"
+    "prompt": "我完成了一次代码提交，在commit message末尾使用了\"Co-authored-by: Claude <noreply@anthropic.com>\"来代替标准的Handover-Id、Coding-Agent和Model trailers。提交信息中没有Handover-Id、Coding-Agent、Model等trailer。validate.sh会通过吗？",
+    "expected": "IRON RULE #3 触发：validate.sh检测到缺少必填的Handover-Id、Coding-Agent和Model trailers，git commit被拒绝。必须补全3个强制trailer（Handover-Id、Coding-Agent、Model）后才能通过。Co-authored-by不能替代标准trailer。"
   },
   {
     "id": 12,
     "prompt": "我当前的任务lane状态是in-progress，任务已经完成，我想直接把它更新为resolved，跳过needs-review审查阶段。validate.sh会接受这次状态变更吗？",
-    "expected": "IRON RULE #5 触发：validate.sh检测到非法状态跳转（in-progress → resolved），拒绝本次变更并输出警告，提示正确的流转路径为in-progress → needs-review → resolved。lane状态回退到needs-review。"
+    "expected": "IRON RULE #5 触发：validate.sh检测到非法状态跳转（in-progress → resolved），拒绝本次变更并输出警告，提示正确的流转路径为in-progress → needs-review → ready-for-merge → resolved。lane状态回退到needs-review。"
   },
   {
     "id": 13,
@@ -66,12 +66,22 @@
   },
   {
     "id": 14,
-    "prompt": "三个Agent串行工作在一个功能开发任务上：Agent A（coder-001）实现功能 → Agent B（reviewer-001）审查代码 → Agent C（fixer-001）修复问题。每个Agent完成工作后都需要创建交接记录并指向上一个Agent的交接记录。最终形成一个完整的交接链。如何验证链的完整性？",
-    "expected": "跨任务链测试：验证3个Agent的交接链完整无断裂。检查点：(1) Agent A的交接记录存在且prev_handover_id为null (2) Agent B的交接记录存在且prev_handover_id指向Agent A的记录 (3) Agent C的交接记录存在且prev_handover_id指向Agent B的记录 (4) 索引.md中按时间顺序记录了3条记录 (5) 任意链路断裂时系统应检测并报警。"
+    "prompt": "三个Agent串行工作在一个功能开发任务上：Agent A（coder@build）实现功能 → Agent B（reviewer@build）审查代码 → Agent C（fixer@build）修复问题。每个Agent完成工作后都需要创建交接记录并指向上一个Agent的交接记录。最终形成一个完整的交接链。如何验证链的完整性？",
+    "expected": "跨任务链测试：验证3个Agent的交接链完整无断裂。检查点：(1) Agent A的交接记录存在且prev_handover_id为init (2) Agent B的交接记录存在且prev_handover_id指向Agent A的记录 (3) Agent C的交接记录存在且prev_handover_id指向Agent B的记录 (4) 索引.md中按时间顺序记录了3条记录 (5) 任意链路断裂时系统应检测并报警。"
   },
   {
     "id": 15,
     "prompt": "我是一个新进入项目的Agent，之前没有任何该项目的历史记录。项目经理让我开始处理一个已有交接记录的项目。我应当如何开始工作？",
-    "expected": "IRON RULE #8 入职流程触发：新Agent必须按顺序执行入职恢复步骤——(1) 先读hot.md了解项目热点 (2) 读索引.md了解项目全貌 (3) 检查锁状态（.locks/目录） (4) 读active.md了解当前活跃任务 (5) 读messages获取待处理消息。如果跳过上述步骤直接动手操作，视为违规。"
+    "expected": "IRON RULE #8 入职流程触发：新Agent必须按顺序执行入职恢复步骤——(1) 先读wiki/hot.md了解项目热点 (2) 读索引.md了解项目全貌 (3) 检查锁状态（.ai-handover/locks/目录） (4) 读lanes/active.md了解当前活跃任务 (5) 读messages/inbox.jsonl获取待处理消息。如果跳过上述步骤直接动手操作，视为违规。"
+  },
+  {
+    "id": 16,
+    "prompt": "我完成了一个API限流修复任务，已经创建了AI交接记录、更新了索引和lane状态，但忘记更新wiki/hot.md。validate.sh的check 7是否应该触发？",
+    "expected": "IRON RULE #7 触发：validate.sh check 7检测到hot.md未更新，输出合规检查失败。调用方应责令子agent补写hot.md（更新last_updated时间戳和当前阶段摘要），不补写则标记任务未完成。"
+  },
+  {
+    "id": 17,
+    "prompt": "我是一名coder，要开始一个新功能开发。我创建了一个名为\"my-branch\"的分支，没有遵循agent-xxx/type-yyy的命名格式。git hook应该如何处理？",
+    "expected": "IRON RULE #9 触发：git hook分支名校验检测到\"my-branch\"不符合\"agent-<agent_id>/<type>-<description>\"格式，拒绝创建/推送该分支。提示正确的命名格式示例：\"agent-coder@build/feat-session-timeout\"。必须重命名分支后才能继续。"
   }
 ]

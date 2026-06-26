@@ -1,24 +1,32 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/anomalyco/ai-handover/schemas/handover.schema.json",
-  "title": "AI Handover v4.0 Execution Record",
-  "description": "Validates the YAML frontmatter of AI handover execution records",
+  "title": "AI Handover v4.1 Execution Record",
+  "description": "Validates the YAML frontmatter of AI handover execution records — IRON RULE #2 compliant",
   "type": "object",
   "required": [
     "handover_id",
+    "prev_handover_id",
     "agent_id",
     "agent_role",
     "coding_agent",
     "model",
     "status",
+    "branch",
     "files_modified",
-    "verification"
+    "verification",
+    "next_action",
+    "lock_files"
   ],
   "properties": {
     "handover_id": {
       "type": "string",
       "pattern": "^\\d{8}_\\d{6}_.+$",
       "description": "Format: YYYYMMDD_HHmmss_description"
+    },
+    "prev_handover_id": {
+      "type": "string",
+      "description": "Previous handover ID for chain continuity (IRON RULE #4). Must be 'init' for first record."
     },
     "agent_id": {
       "type": "string",
@@ -49,6 +57,10 @@
         "cancelled"
       ]
     },
+    "branch": {
+      "type": "string",
+      "description": "Current git branch name (IRON RULE #2)"
+    },
     "handover_type": {
       "type": "string",
       "enum": ["handover", "progress", "decision"]
@@ -63,6 +75,10 @@
     },
     "task_description": {
       "type": "string"
+    },
+    "next_action": {
+      "type": "string",
+      "description": "Specifies the next agent's action (IRON RULE #2). e.g. '@reviewer please review src/auth/session.ts:42-48'"
     },
     "started_at": {
       "type": "string",
@@ -98,6 +114,14 @@
         "minLength": 1
       },
       "uniqueItems": true
+    },
+    "lock_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "File lock declarations for parallel agent coordination (IRON RULE #6)"
     },
     "verification": {
       "type": "array",

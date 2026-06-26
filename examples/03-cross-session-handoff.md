@@ -24,9 +24,7 @@ task_type: "feature"
 handover_type: "handover"
 
 # === 链 — 跨 Session 引用 ===
-prev_handover_id:
-  - "2026-06-26_090000_explore-oidc"    # Session 1: Claude Code 探索
-  - "2026-06-27_140000_research-oidc"   # Session 2: GPT-4o 研究
+prev_handover_id: "2026-06-26_090000_explore-oidc,2026-06-27_140000_research-oidc"
 
 # === 状态机 ===
 status: "completed"
@@ -46,6 +44,7 @@ files_added:
   - "src/auth/__tests__/oidc.test.ts"
   - "config/oidc.yml"
 files_deleted: []
+lock_files: []
 verification:
   - "npm test -- --coverage:pass (94.2%)"
   - "npm run typecheck:pass"

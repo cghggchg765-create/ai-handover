@@ -1,6 +1,6 @@
 ---
 name: ai-handover
-description: AI 交接记录标准化技能 v4.1。IRON RULE 强制合规系统 + 多 Agent 协作协调层——YAML Frontmatter + 三層記憶(wiki/agents/messages) + Lane 状态机 + Git Trailers(Coding-Agent/Model/Constraints) + Slack/Discord 消息中继。纯 Markdown，平台无关。
+description: AI 交接记录标准化技能 v4.1。IRON RULE 强制合规系统 + 多 Agent 协作协调层——YAML Frontmatter + 三层记忆(wiki/agents/messages) + Lane 状态机 + Git Trailers(Coding-Agent/Model/Constraints) + Slack/Discord 消息中继。纯 Markdown，平台无关。
 version: 4.1
 ---
 
@@ -23,9 +23,9 @@ version: 4.1
 2. [IRON RULE 系统（强制合规）](#-iron-rule-系统强制合规)
 3. [YAML Frontmatter Schema — 机器可解析](#-yaml-frontmatter-schema--机器可解析)
 4. [三层记忆架构](#-三层记忆架构)
-    - 4.1 [Wiki 层 — User Memory（显式知识）](#41-wiki-层--user-memory显式知识)
-    - 4.2 [Agent 层 — Agent Memory（学习沉淀）](#42-agent-层--agent-memory学习沉淀)
-    - 4.3 [Messages 层 — Cross-Agent 消息](#43-messages-层--cross-agent-消息)
+    - 3.1 [Wiki 层 — User Memory（显式知识）](#31-wiki-层--user-memory显式知识)
+    - 3.2 [Agent 层 — Agent Memory（学习沉淀）](#32-agent-层--agent-memory学习沉淀)
+    - 3.3 [Messages 层 — Cross-Agent 消息](#33-messages-层--cross-agent-消息)
 5. [跨任务交接链](#-跨任务交接链)
 6. [Lane 状态机](#-lane-状态机)
 7. [并行 Agent 协调](#-并行-agent-协调)
@@ -131,7 +131,7 @@ version: 4.1
 ```
 ✅ 必填的 YAML 字段（不可省略）：
   handover_id, prev_handover_id, agent_id, agent_role, coding_agent,
-  model, status, branch, files_modified, verification, next_action
+  model, status, branch, files_modified, verification, next_action, lock_files
 ❌ 禁止：用 Markdown 表格代替 YAML frontmatter
 ❌ 禁止：添加自定义字段（如 "my_custom_field"）
 ✅ 推荐：Markdown 正文可自由发挥（供人类阅读）
@@ -194,7 +194,7 @@ Co-authored-by: Claude <noreply@anthropic.com>
 2. ✅ 执行记录.md 是否存在且包含 YAML frontmatter（所有必填字段）
 3. ✅ AI交接记录/索引.md 是否已更新
 4. ✅ AI交接记录/lanes/active.md 状态是否已更新
-5. ✅ IRON RULE #1-#4 是否遵守（有交接记录、格式正确、trailers 完整、链完整）
+5. ✅ IRON RULE #1-#9 是否遵守（有交接记录、格式正确、trailers 完整、链完整、状态门控、文件锁、hot.md 更新、入职流程、分支策略）
 
 全部通过 → 标记任务完成
 任一不通过 → 🔴 拒绝，将不通过项列表返回子 agent 责令补写
@@ -687,9 +687,9 @@ updated_at: 2026-06-26T15:00:00-07:00
 | 修改完成 | 删除 lock.json | 不释放锁 → >30min 自动标记 warn |
 | 死锁检测 | >30min 无 heartbeat | 标记 stale，通知调用方 |
 
-### 6.2 分支策略（IRON RULE #9）
+### IRON RULE #9: 分支策略强制
 
-🔴 **并行任务必须使用独立分支。**
+🔴 **并行任务必须使用独立分支。** 每个并行 Agent 必须在独立分支上完成工作。
 
 ```
 分支命名: agent-<agent_id>/<type>-<description>
@@ -991,7 +991,7 @@ AI交接记录/YYYY-MM-DD_HHmmss_任务简述/
 参考 [YAML Frontmatter Schema](#-yaml-frontmatter-schema--机器可解析) 填写。
 
 > 🔴 CHECKPOINT: 执行记录写入后，立即检查：
-> - YAML frontmatter 是否包含所有必填字段（handover_id / agent_id / agent_role / coding_agent / model / status / files_modified / verification）
+> - YAML frontmatter 是否包含所有必填字段（handover_id / prev_handover_id / agent_id / agent_role / coding_agent / model / status / branch / files_modified / verification / next_action / lock_files）
 > - Markdown 正文是否包含执行摘要 + 产出物
 > - 遗留问题是否标记了 🔴🟡🟢
 > 缺字段 → 补充后再继续。
@@ -1058,7 +1058,7 @@ Confidence: <level>"
 | # | 检查项 | 通过标准 |
 |:-:|:------|:--------|
 | 1 | 文件夹命名 | 格式 `YYYY-MM-DD_HHmmss_中文简述`，精确到秒 |
-| 2 | YAML frontmatter | 包含所有必填字段（handover_id / agent_id / agent_role / status / files_modified / verification） |
+| 2 | YAML frontmatter | 包含所有必填字段（handover_id / prev_handover_id / agent_id / agent_role / coding_agent / model / status / branch / files_modified / verification / next_action / lock_files） |
 | 3 | 执行记录字段 | 按模块选择矩阵包含对应字段 |
 | 4 | 索引已更新 | 新条目出现在索引文件顶部 |
 | 5 | Lane 状态更新 | active.md 状态与实际匹配 |
@@ -1196,7 +1196,7 @@ v4.0 支持将 `messages/inbox.jsonl` 中的消息通过 webhook 推送到 Slack
 
 | 版本 | 日期 | 变更 |
 |:----:|:----:|:-----|
-| **4.1** | 2026-06-26 | **IRON RULE 强制合规系统**：8 条铁律（强制写交接/模板格式/git trailers/交接链/状态门控/文件锁/hot.md 更新/入职流程）+ 调用方拒绝协议 + 跨任务交接链 + 串行验证门控 + 并行 Agent 协调（文件锁/分支策略/依赖图）+ Git 事件 ↔ Lane 状态映射 + validate.sh 增强（4→8 项）+ 12 条新反模式 |
+| **4.1** | 2026-06-26 | **IRON RULE 强制合规系统**：9 条铁律（强制写交接/模板格式/git trailers/交接链/状态门控/文件锁/hot.md 更新/入职流程）+ 调用方拒绝协议 + 跨任务交接链 + 串行验证门控 + 并行 Agent 协调（文件锁/分支策略/依赖图）+ Git 事件 ↔ Lane 状态映射 + scripts/validate.sh 增强（4→8 项）+ 12 条新反模式 |
 | **4.0** | 2026-06-26 | **多 Agent 协作完整升级**：YAML Frontmatter Schema + 三层记忆（wiki/agents/messages）+ Lane 状态机 + Git Trailers 协议 + Slack/Discord 消息中继 + 新增 15+ 模板 + 升级所有执行流程 |
 | **3.2** | 2026-06-24 | Darwin 进化：集中式失败 if-then 表 + 3 处工作流检查点 + frontmatter 优化，评分 74.5 → 79.4 |
 | **3.1** | 2026-06-24 | P0 强制触发（执行方必须写交接）+ 任务完成报告格式 + 调用方验证责任 + 空返回/失败处理 + 反模式更新 |

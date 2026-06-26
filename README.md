@@ -5,11 +5,11 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-4.1-brightgreen" alt="Version 4.1">
-  <img src="https://img.shields.io/badge/Darwin%20Score-82.7%20(%2B3.3)-blue" alt="Darwin Score 82.7">
-  <img src="https://img.shields.io/badge/IRON%20RULE-8%20rules%20enforced-red" alt="8 IRON RULES">
+  <img src="https://img.shields.io/badge/Darwin%20Score-82.7%20(planned)-orange" alt="Darwin Score 82.7 (planned)">
+  <img src="https://img.shields.io/badge/IRON%20RULE-9%20rules%20enforced-red" alt="9 IRON RULES">
   <img src="https://img.shields.io/badge/platform-OpenCode_%7C_Claude_Code_%7C_Cursor_%7C_Codex_CLI-purple" alt="Multi-platform">
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT License">
-  <img src="https://img.shields.io/badge/eval-15%20scenarios-ff69b4" alt="15 evaluation scenarios">
+  <img src="https://img.shields.io/badge/eval-17%20scenarios-ff69b4" alt="17 evaluation scenarios">
 </p>
 
 ---
@@ -18,22 +18,23 @@
 
 | | | |
 |:---:|:---:|:---:|
-| **IRON RULE 强制合规**<br>8 条不可协商的 P0 铁律<br>涵盖交接/元数据/Trailer/状态机/锁<br>违反即任务未完成 | **三层记忆**<br>`wiki/` 持久知识沉淀<br>`agents/` 跨会话学习<br>`messages/` 实时协调 | **Git 同步**<br>4 种强制 git trailer<br>validate.sh 提交前校验<br>`Coding-Agent` / `Model` / `Constraint` / `Rejected-Alternatives` |
+| **IRON RULE 强制合规**<br>9 条不可协商的 P0 铁律<br>涵盖交接/元数据/Trailer/状态机/锁/分支<br>违反即任务未完成 | **三层记忆**<br>`wiki/` 持久知识沉淀<br>`agents/` 跨会话学习<br>`messages/` 实时协调 | **Git 同步**<br>3 种强制 git trailer<br>validate.sh 提交前校验<br>`Handover-Id` / `Coding-Agent` / `Model` |
 
 ---
 
-## IRON RULE 8 条 快速一览
+## IRON RULE 9 条 快速一览
 
 | # | 规则 | 后果 | 检测机制 |
 |:-:|:-----|:----:|:--------:|
-| 1 | 完成任务必须写 AI 交接记录 | 拒收结果，标记未完成 | 调用方前置检查 |
-| 2 | YAML frontmatter 必填字段不可缺失 | 责令按模板重写 | 正则校验 + Schema 验证 |
-| 3 | 提交必须包含 4 种强制 trailer | `validate.sh` 拒绝 commit | `validate.sh` + git hook |
-| 4 | Co-authored-by 不可替代 Coding-Agent/Model trailers | `validate.sh` 拒绝 commit | trailer 白名单检查 |
-| 5 | Lane 状态机禁止跳过 review（in-progress → needs-review → resolved） | 回退 + 警告输出 | `validate.sh` 状态机检查 |
-| 6 | 并行写同一文件必须声明文件锁 | 第二个写入阻塞/冲突标记 | `.locks/` 锁检测 |
-| 7 | 分支命名必须遵循 `<agent-type>/<task-summary>` 格式 | 不合规分支被拒绝合并 | git hook 分支名校验 |
-| 8 | 新 Agent 必须按入职流程恢复上下文 | 跳过步骤视为违规 | 入职顺序检查器 |
+| 1 | 强制写交接记录 | 拒收结果，标记未完成 | 调用方前置检查 |
+| 2 | 模板格式强制（YAML双轨制） | 责令按模板重写 | 正则校验 + Schema 验证 |
+| 3 | Git trailers 强制（Coding-Agent + Model + Handover-Id） | `validate.sh` 拒绝 commit | `validate.sh` + git hook |
+| 4 | 交接链强制（prev_handover_id 必填） | 链断裂标记，责令补充 | `validate.sh` 链完整性检查 |
+| 5 | 串行状态门控（不可跳过 needs-review） | 回退 + 警告输出 | `validate.sh` 状态机检查 |
+| 6 | 并行文件锁 | 第二个写入阻塞/冲突标记 | `.ai-handover/locks/` 锁检测 |
+| 7 | hot.md 强制更新 | 未更新视为任务未完成 | `validate.sh` check 7 |
+| 8 | 新 Agent 入职流程 | 跳过步骤视为违规 | 入职顺序检查器 |
+| 9 | 分支策略强制（agent-xxx/type-yyy 格式） | 不合规分支被拒绝合并 | git hook 分支名校验 |
 
 ---
 
@@ -44,34 +45,39 @@
 ├── AI交接记录/
 │   ├── 索引.md                         ← 时间倒序总览（自动更新）
 │   ├── 统计.md                         ← 全局统计
-│   ├── 2026-05-17_121836_数据库迁移/    ← YAML frontmatter 执行记录
-│   │   ├── 执行记录.md                  ← 完整交接内容（含 prev_handover_id）
-│   │   └── review-response.md           ← 评审反馈
-│   └── 2026-06-10_093000_API限流修复/
-│       └── 执行记录.md
-├── .locks/
-│   ├── src/config.yaml.lock             ← 文件锁（并行写入保护）
-│   └── ...
-├── wiki/
-│   ├── hot.md                           ← 高频模式/热点知识
-│   └── bugs.md                          ← 已知 bug 模式库
-├── agents/
-│   └── coder-001/                       ← 跨会话 agent 学习记录
-│       └── 学习记录.md
-├── messages/
-│   └── inbox.jsonl                      ← agent 间异步消息队列
-├── lanes/
-│   └── current.yaml                     ← 任务状态机（pending / in-progress / needs-review / resolved）
-├── active.md                            ← 当前活跃任务列表
-├── references/
-│   └── templates/
-│       ├── software.md
-│       ├── academic.md
-│       ├── docs.md
-│       └── ops.md
-├── validate.sh                          ← IRON RULE 合规校验脚本
-└── branches/
-    └── policy.yaml                      ← 分支命名策略定义
+│   ├── wiki/                           ← Layer 1: 持久知识
+│   │   ├── hot.md                      ← 热缓存（先读）
+│   │   ├── preferences.md              ← 用户偏好
+│   │   ├── patterns.md                 ← 跨项目模式
+│   │   ├── decisions.md                ← ADR 决策记录
+│   │   └── bugs.md                     ← 已知 bug
+│   ├── agents/                         ← Layer 2: 跨会话学习
+│   │   └── <agent_id>/
+│   │       ├── profile.md              ← Agent 人格 + 权威边界
+│   │       └── history.jsonl           ← 学习记录
+│   ├── messages/                       ← Layer 3: 实时协调
+│   │   ├── inbox.jsonl                 ← 待处理消息
+│   │   └── archive/                    ← 已处理归档
+│   ├── lanes/                          ← 状态机
+│   │   ├── active.md                   ← 当前活跃任务
+│   │   └── reviews.md                  ← Review 队列
+│   ├── rules/
+│   │   └── 05-git-coordination.md      ← Git 事件 ↔ Lane 状态映射
+│   └── <timestamp>_<task>/             ← 每次任务一个文件夹
+│       ├── 执行记录.md                 ← YAML frontmatter + Markdown
+│       ├── verification.log            ← 验证日志
+│       └── messages.md                 ← 消息记录
+├── .ai-handover/
+│   ├── locks/                          ← 文件锁（IRON RULE #6 并行保护）
+│   ├── references/
+│   │   ├── templates/
+│   │   │   ├── software.md
+│   │   │   ├── academic.md
+│   │   │   ├── docs.md
+│   │   │   └── ops.md
+│   │   └── schemas/                    ← YAML Schema 定义
+│   └── validate.sh                     ← IRON RULE 合规校验脚本
+└── active.md                           ← 当前活跃任务列表（快捷入口）
 ```
 
 ---
@@ -86,13 +92,12 @@ mkdir -p ~/.config/opencode/skills/ai-handover
 cp -r SKILL.md references ~/.config/opencode/skills/ai-handover/
 
 # Step 2: 注册 validate.sh 作为 git hook
-cp validate.sh .git/hooks/pre-commit
+cp scripts/validate.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
 # Step 3: 初始化项目交接目录
-mkdir -p AI交接记录 .locks wiki agents messages lanes
-touch AI交接记录/索引.md lanes/current.yaml active.md
-echo "[]" > messages/inbox.jsonl
+mkdir -p AI交接记录/wiki AI交接记录/agents AI交接记录/messages/archive AI交接记录/lanes .ai-handover/locks .ai-handover/references/templates .ai-handover/references/schemas
+touch AI交接记录/索引.md AI交接记录/lanes/active.md AI交接记录/lanes/reviews.md AI交接记录/messages/inbox.jsonl active.md
 ```
 
 ### 30 秒使用
@@ -113,55 +118,76 @@ skill("ai-handover")
 
 ### IRON RULE 系统
 
-v4.1 引入 **8 条 IRON RULE**，每条规则对应一个强制合规检查点：
+v4.1 引入 **9 条 IRON RULE**，每条规则对应一个强制合规检查点：
 
 | 规则 | 触发阶段 | 对应组件 |
 |:----:|:--------:|:--------:|
-| #1 交接记录 | 任务完成时 | 调用方检查器 |
-| #2 YAML Schema | 交接记录创建时 | frontmatter 验证器 |
+| #1 强制写交接记录 | 任务完成时 | 调用方检查器 |
+| #2 模板格式强制 | 交接记录创建时 | frontmatter 验证器 |
 | #3 Git Trailers | git commit 时 | `validate.sh` |
-| #4 Trailer 禁用别名 | git commit 时 | `validate.sh` |
-| #5 Lane 状态机 | lane 状态变更时 | `validate.sh` |
-| #6 文件锁 | 并发写入时 | `.locks/` 锁管理器 |
-| #7 分支命名 | 创建分支时 | git hook |
-| #8 Agent 入职 | 新 agent 加入时 | 入职顺序检查器 |
+| #4 交接链强制 | 交接记录创建时 | `validate.sh` 链检查 |
+| #5 串行状态门控 | lane 状态变更时 | `validate.sh` |
+| #6 并行文件锁 | 并发写入时 | `.ai-handover/locks/` 锁管理器 |
+| #7 hot.md 强制更新 | 交接完成后 | `validate.sh` |
+| #8 新 Agent 入职流程 | 新 agent 加入时 | 入职顺序检查器 |
+| #9 分支策略强制 | 创建分支时 | git hook |
 
 违反任何 IRON RULE 都会导致任务被标记为未完成。规则不可绕过、不可协商、不可豁免。
 
 ### YAML Frontmatter Schema（v4.1）
 
-每份执行记录开头必须包含标准化的 YAML 元信息：
+每份执行记录开头必须包含标准化的 YAML 元信息（双轨制——YAML frontmatter 机器可解析 + Markdown 正文人类可阅读）：
 
 ```yaml
 ---
-title: 数据库迁移脚本重构
-agent: coder
-agent_version: glm-5.2
-type: handover
-status: completed
-lane: needs-review
-created_at: 2026-06-25T14:30:00+08:00
-prev_handover_id: 2026-06-25_120000_API设计     # 上一交接记录（链式追溯）
-tags:
-  - database
-  - migration
-  - schema
-revisions: 1
+# === Agent 身份 ===
+handover_id: 2026-06-26_143052_user-auth   # 唯一 ID：<日期>_<时间>_<任务简述>
+prev_handover_id: init                       # 前一个交接 ID，首次填 "init"
+agent_id: coder@build                         # Agent 唯一标识：<角色>@<会话>
+agent_role: worker                            # 枚举：primary / orchestrator / worker / reviewer / validator
+coding_agent: OpenCode v1.2.3                 # 工具层
+model: claude-opus-4-6                        # 模型层
+
+# === 任务标识 ===
+task_type: feature                            # 枚举：feature / fix / refactor / docs / research / review
+handover_type: handover                       # 枚举：handover / progress / decision
+
+# === 状态机 ===
+status: needs-review                          # 枚举：idle / in-progress / needs-review / ready-for-merge / resolved / blocked
+previous_status: in-progress                  # 上一个状态（审计用）
+branch: feat/user-auth                        # 当前分支
+
+# === 变更证据 ===
+files_modified:                               # 修改的文件列表
+  - src/auth/login.ts
+  - src/auth/session.ts
+lock_files:                                    # IRON RULE #6: 文件锁列表
+  - .ai-handover/locks/src-auth-session.json
+verification:                                 # 验证结果 [命令]:[状态]
+  - "npm test -- --grep session:pass"
+
+# === 风险与后续 ===
+next_action: "@reviewer please review src/auth/session.ts:42-48"
+confidence: high                              # 枚举：low / medium / high
 ---
 ```
 
 | 字段 | 必填 | v4.1 新增 | 说明 |
 |------|:----:|:---------:|------|
-| `title` | ✅ | | 任务简述 |
-| `agent` | ✅ | | 执行 agent 类型 |
-| `agent_version` | ✅ | | agent 模型标识 |
-| `type` | ✅ | | handover / progress / decision |
-| `status` | ✅ | | completed / blocked / partial |
-| `lane` | ✅ | | in-progress / needs-review / resolved |
-| `created_at` | ✅ | | ISO 8601 时间戳 |
-| `prev_handover_id` | | ✅ | 上一交接记录目录名，用于链式追溯 |
-| `tags` | ✅ | | 分类标签 |
-| `revisions` | ✅ | | 修订版本号 |
+| `handover_id` | ✅ | ✅ | 全局唯一 ID，`<日期>_<时间>_<任务简述>` |
+| `prev_handover_id` | ✅ | ✅ | 前一个交接 ID，首次填 `init`（IRON RULE #4）|
+| `agent_id` | ✅ | ✅ | `角色@会话` 格式，如 `coder@build` |
+| `agent_role` | ✅ | ✅ | primary / orchestrator / worker / reviewer / validator |
+| `coding_agent` | ✅ | ✅ | 使用的 AI 工具 |
+| `model` | ✅ | ✅ | 模型名称 |
+| `status` | ✅ | | 当前 Lane 状态 |
+| `branch` | ✅ | ✅ | 当前分支 |
+| `files_modified` | ✅ | ✅ | 至少 1 个 |
+| `verification` | ✅ | ✅ | 至少 1 个 |
+| `lock_files` | ✅ | ✅ | 文件锁列表（IRON RULE #6 强制）|
+| `next_action` | ✅ | ✅ | 指定下一个 Agent 的动作 |
+
+> 🔴 IRON RULE #2 强制：以上 12 个字段为必填，不可省略。
 
 ### 三层记忆
 
@@ -181,29 +207,37 @@ Layer 3: messages/   ← 实时协调（agent 间异步通讯）
 ### Lane 状态机
 
 ```
-         ┌──────────┐
-         │  pending  │
-         └────┬─────┘
-              │ 开始执行
-              ↓
-      ┌───────────────┐
-      │  in-progress   │
-      └───────┬───────┘
-              │ 任务完成
-              ↓
-     ┌──────────────────┐
-     │  needs-review     │ ← IRON RULE #5: 非法跳过此步则拒绝+回退
-     └────────┬─────────┘
-              │ 评审通过
-              ↓
-        ┌────────────┐
-        │  resolved   │
-        └────────────┘
+          ┌──────────┐
+          │   idle   │
+          └────┬─────┘
+               │ 开始执行
+               ↓
+       ┌───────────────┐
+       │  in-progress   │
+       └───┬───────┬───┘
+           │       │ (阻塞)
+           ↓       ↓
+   ┌──────────────────┐     ┌──────────┐
+   │  needs-review     │ ←── │ blocked  │
+   └───┬──────────┬───┘     └──────────┘
+       │ (通过)    │ (不通过)
+       ↓           ↓
+ ┌─────────────────┐    ┌──────────────────┐
+ │ ready-for-merge  │    │ changes-requested  │
+ └────────┬────────┘    └────────┬─────────┘
+          │ 合并                  │ 返回修改
+          ↓                      ↓
+    ┌──────────┐          ┌───────────────┐
+    │ resolved │          │  in-progress   │
+    └──────────┘          └───────────────┘
+
+另外支持：idle → cancelled（取消）
 ```
 
 **非法状态迁移检测（validate.sh）**：
 - `in-progress → resolved`：❌ IRON RULE #5 违规，拒绝变更
-- `needs-review → in-progress`：⚠️ 退回修改，允许
+- `in-progress → ready-for-merge`：❌ 跳过 needs-review，拒绝
+- `needs-review → in-progress`：⚠️ 退回修改，允许（changes-requested 后）
 - `resolved → needs-review`：⚠️ 重新评审，允许
 
 ### Git Trailers 协议
@@ -212,25 +246,33 @@ Layer 3: messages/   ← 实时协调（agent 间异步通讯）
 
 ```
 commit abc123def456
-Author: coder <agent@ai-handover>
+Author: coder@build <agent@ai-handover>
 Date:   Thu Jun 25 14:30:00 2026 +0800
 
-    fix: API rate limiter overflow (#42)
+    feat(auth): add session timeout
 
-    Coding-Agent: glm-5.2
-    Model: v4.1
-    Constraint: compatible with Python 3.8+
-    Rejected-Alternatives: Redis (avoids new dependency)
+    Implement 30-min idle session timeout to match security policy.
+
+    Handover-Id: 2026-06-26_143052_user-auth
+    Coding-Agent: OpenCode v1.2.3
+    Model: claude-opus-4-6
+    Constraint: must not break mobile refresh flow
+    Rejected-Alternatives: JWT-only validation | double crypto surface
+    Verification: npm test -- --grep session:pass
+    Confidence: high
 ```
 
 | Trailer | 必填 | IRON RULE | 说明 |
 |---------|:----:|:---------:|------|
-| `Coding-Agent` | ✅ | #3 | 执行编码的 agent 标识 |
-| `Model` | ✅ | #3 | 模型版本号 |
-| `Constraint` | ✅ | #3 | 关键约束条件 |
-| `Rejected-Alternatives` | ✅ | #3 | 已排除的方案及理由 |
+| `Handover-Id` | ✅ | #3 | 关联交接记录 ID |
+| `Coding-Agent` | ✅ | #3 | 使用的 AI 工具 |
+| `Model` | ✅ | #3 | 模型名称 |
+| `Constraint` | 🟡 | | 关键约束条件（可重复）|
+| `Rejected-Alternatives` | 🟡 | | 已排除的方案及理由（可重复）|
+| `Verification` | 🟡 | | 验证命令 + 结果 |
+| `Confidence` | 🟡 | | 信心度 |
 
-**禁止**：使用 `Co-authored-by` 或其他非标准 trailer 替代上述 4 种强制 trailer（IRON RULE #4）。
+**禁止**：使用 `Co-authored-by` 或其他非标准 trailer 替代 `Handover-Id` / `Coding-Agent` / `Model`（IRON RULE #3）。
 
 ---
 
@@ -239,15 +281,18 @@ Date:   Thu Jun 25 14:30:00 2026 +0800
 > **调用方（主 agent）在发现以下情况时必须拒绝接受子 agent 的返回结果：**
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  违反 IRON RULE #1 → 缺交接记录 → 拒收             │
-│  违反 IRON RULE #2 → YAML 缺字段  → 责令重写       │
-│  违反 IRON RULE #3 → 缺 trailers → 拒绝 commit     │
-│  违反 IRON RULE #5 → 非法跳转    → 回退 + 警告     │
-│  违反 IRON RULE #6 → 锁冲突      → 标记冲突        │
-│  子 agent 返回空  → 重新委托/简化/换 agent         │
-│  连续 2 次失败    → 升级给用户                     │
-└─────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│  违反 IRON RULE #1 → 缺交接记录 → 拒收                 │
+│  违反 IRON RULE #2 → YAML 缺字段  → 责令重写           │
+│  违反 IRON RULE #3 → 缺 trailers → 拒绝 commit         │
+│  违反 IRON RULE #4 → 链断裂      → 责令补充             │
+│  违反 IRON RULE #5 → 非法跳转    → 回退 + 警告          │
+│  违反 IRON RULE #6 → 锁冲突      → 标记冲突             │
+│  违反 IRON RULE #7 → 未更新 hot.md → 责令补写          │
+│  违反 IRON RULE #9 → 分支命名不合规 → 拒绝合并          │
+│  子 agent 返回空  → 重新委托/简化/换 agent              │
+│  连续 2 次失败    → 升级给用户                          │
+└────────────────────────────────────────────────────────┘
 ```
 
 **底线**：调用方**禁止**绕过拒绝协议自己动手修改子 agent 的输出。必须重新委托或升级处理。
@@ -262,25 +307,25 @@ Date:   Thu Jun 25 14:30:00 2026 +0800
 
 ```bash
 # Agent A 获取锁
-echo "coder-001" > .locks/src/config.yaml.lock
+echo "coder@build" > .ai-handover/locks/src-config-yaml.json
 
 # Agent B 尝试获取锁（失败）
-cat .locks/src/config.yaml.lock  # → "coder-001"
-# → 输出警告：文件已被 coder-001 锁定，等待释放
+cat .ai-handover/locks/src-config-yaml.json  # → "coder@build"
+# → 输出警告：文件已被 coder@build 锁定，等待释放
 
 # Agent A 释放锁
-rm .locks/src/config.yaml.lock
+rm .ai-handover/locks/src-config-yaml.json
 ```
 
-### 分支策略（IRON RULE #7）
+### 分支策略（IRON RULE #9）
 
-所有分支命名必须遵循 `<agent-type>/<task-summary>` 格式：
+所有分支命名必须遵循 `agent-<agent_id>/<type>-<description>` 格式：
 
 | 分支名 | 合规 | 说明 |
 |:-------|:----:|:-----|
-| `coder/fix-auth-token` | ✅ | agent 类型 + 任务描述 |
-| `reviewer/review-auth-module` | ✅ | reviewer 分支 |
-| `fix-bug` | ❌ | 缺少 agent 类型前缀 |
+| `agent-coder@build/feat-session-timeout` | ✅ | agent 标识 + 类型 + 任务描述 |
+| `agent-reviewer@codex/review-login` | ✅ | reviewer 分支 |
+| `my-branch` | ❌ | 缺少 agent 前缀和类型 |
 | `main` | ✅ | 受保护分支，规则豁免 |
 
 ---
@@ -295,9 +340,9 @@ rm .locks/src/config.yaml.lock
 | Round 1 | 78.7 | +4.2 | 集中式失败 if-then 表 + 3 处工作流显式检查点 |
 | Round 2 | 79.4 | +0.7 | 精简 frontmatter + 版本号一致性修复 |
 | **v4.0** | **79.4** | **—** | **YAML结构 + 三层记忆 + Lane状态机 + Git Trailers + 多Agent消息协议** |
-| **v4.1** | **82.7** | **+3.3** | **IRON RULE系统 + 文件锁 + validate.sh + 分支策略 + 扩展评估集至15场景** |
+| **v4.1** | **82.7 (planned)** | **+3.3** | **IRON RULE系统 + 文件锁 + validate.sh + 分支策略 + 扩展评估集至17场景** |
 
-**9 维度评分明细（v4.1）**：
+> **Note**: v4.1 Darwin 评分 82.7 为计划目标（planned target）。当前处于评估阶段，最终分数以实际 Darwin 评测结果为准。9 维度评分反映设计目标，非实测数据。
 
 ```
 结构完整性    ██████████████░░  84%  (+5)
@@ -315,7 +360,7 @@ rm .locks/src/config.yaml.lock
 
 ## 评估集
 
-`test-prompts.json` 包含 **15 个测试场景**（P0 覆盖 + v4.0 多Agent + v4.1 IRON RULE）：
+`test-prompts.json` 包含 **17 个测试场景**（P0 覆盖 + v4.0 多Agent + v4.1 IRON RULE + v4.1 扩展）：
 
 | ID | 场景 | 验证内容 | 归属版本 |
 |:--:|:----|:--------|:--------:|
@@ -325,15 +370,17 @@ rm .locks/src/config.yaml.lock
 | 4 | 多Agent交接 | YAML frontmatter + lane更新 + inbox消息 + 索引 | v4.0 |
 | 5 | 跨Agent消息协议 | 消息链读取 + review-response 生成 + 状态 resolved | v4.0 |
 | 6 | Lane状态机校验 | 非法状态迁移检测 + 警告输出 | v4.0 |
-| 7 | Git Trailers | Coding-Agent / Model / Constraint / Rejected-Alternatives | v4.0 |
+| 7 | Git Trailers | Handover-Id / Coding-Agent / Model / Constraint / Rejected-Alternatives | v4.0 |
 | 8 | Wiki知识提取 | bugs.md 新增 + hot.md 更新 | v4.0 |
 | 9 | IRON RULE #1 测试 | 缺交接记录 → 调用方拒收 + 责令补写 | v4.1 |
 | 10 | IRON RULE #2 测试 | YAML 缺字段 → 调用方拒收 + 列出缺失字段 | v4.1 |
-| 11 | IRON RULE #3+#4 测试 | Co-authored-by 替代 trailers → validate.sh 拒绝 | v4.1 |
+| 11 | IRON RULE #3 测试 | 缺 trailers → validate.sh 拒绝 commit | v4.1 |
 | 12 | IRON RULE #5 测试 | lane 跳过 review → validate.sh 回退 + 警告 | v4.1 |
 | 13 | IRON RULE #6 测试 | 并行写文件 + 锁冲突 → 阻塞 + 冲突标记 | v4.1 |
 | 14 | 跨任务链测试 | 3 Agent 交接链完整性 → prev_handover_id 链无断裂 | v4.1 |
 | 15 | IRON RULE #8 测试 | 新 Agent 入职 → 按序恢复上下文 | v4.1 |
+| 16 | IRON RULE #7 测试 | Agent 完成任务后未更新 hot.md → 合规检查失败 | v4.1 |
+| 17 | IRON RULE #9 测试 | Agent 创建不合规分支 → 分支命名校验拒绝 | v4.1 |
 
 ---
 
@@ -345,19 +392,20 @@ rm .locks/src/config.yaml.lock
 | 模块选择矩阵 | ✅ | ✅ | ✅ |
 | 失败处理表 | ✅ | ✅ | ✅ |
 | **YAML Frontmatter** | ❌ | ✅ 强制校验 | ✅ 新增 prev_handover_id |
-| **IRON RULE 系统** | ❌ | ❌ | ✅ 8 条强制规则 |
+| **IRON RULE 系统** | ❌ | ❌ | ✅ 9 条强制规则 |
 | **三层记忆 (wiki/agents/messages)** | ❌ | ✅ 持久化 | ✅ 持久化 |
-| **Lane 状态机** | ❌ | ✅ 含非法迁移检测 | ✅ validate.sh 自动校验 |
-| **Git Trailers** | ❌ | ✅ 4 种强制 trailer | ✅ validate.sh commit 检查 |
+| **Lane 状态机** | ❌ | ✅ 含非法迁移检测 | ✅ validate.sh 自动校验（idle/in-progress/needs-review/ready-for-merge/resolved） |
+| **Git Trailers** | ❌ | ✅ 3 种强制 trailer | ✅ validate.sh commit 检查 |
 | **多Agent 消息协议** | ❌ | ✅ inbox.jsonl | ✅ inbox.jsonl |
 | **跨Agent 评审闭环** | ❌ | ✅ review闭环 | ✅ review闭环 |
 | **Wiki 知识提取** | ❌ | ✅ bugs.md + hot.md | ✅ bugs.md + hot.md |
-| **文件锁机制** | ❌ | ❌ | ✅ `.locks/` 并发保护 |
-| **分支命名策略** | ❌ | ❌ | ✅ git hook 校验 |
+| **文件锁机制** | ❌ | ❌ | ✅ `.ai-handover/locks/` 并发保护 |
+| **分支命名策略** | ❌ | ❌ | ✅ IRON RULE #9 git hook 校验 |
+| **hot.md 强制更新** | ❌ | ❌ | ✅ IRON RULE #7 validate.sh 检查 |
 | **调用方拒绝协议** | ❌ | ❌ | ✅ 正式定义 |
 | **validate.sh 合规脚本** | ❌ | ❌ | ✅ git hook + 状态机校验 |
-| 评估场景数 | 3 | 8 | **15** |
-| Darwin 评分 | 79.4 | 79.4+ | **82.7** |
+| 评估场景数 | 3 | 8 | **17** |
+| Darwin 评分 | 79.4 | 79.4+ | **82.7 (planned)** |
 
 ---
 
@@ -376,7 +424,7 @@ rm .locks/src/config.yaml.lock
 
 | 版本 | 日期 | 变更 |
 |:----:|:----:|:-----|
-| **4.1** | 2026-06-26 | **IRON RULE 系统升级**：8 条不可协商的 P0 铁律；validate.sh 合规校验脚本（trailer 检查 + 状态机校验 + 分支名检查）；`.locks/` 文件锁机制支持并行 Agent 安全写入；`prev_handover_id` 字段实现交接链完整追溯；正式定义调用方拒绝协议；分支命名策略 git hook；`active.md` 活跃任务追踪；新 Agent 入职流程（IRON RULE #8）；评估场景从 8 扩展至 15；Darwin 评分 79.4 → 82.7 |
+| **4.1** | 2026-06-26 | **IRON RULE 系统升级**：9 条不可协商的 P0 铁律（#1 强制写交接 / #2 模板格式 / #3 git trailers / #4 交接链 / #5 状态门控 / #6 文件锁 / #7 hot.md 更新 / #8 入职流程 / #9 分支策略）；validate.sh 合规校验脚本（trailer 检查 + 状态机校验 + 分支名检查）；`.ai-handover/locks/` 文件锁机制支持并行 Agent 安全写入；`prev_handover_id` 字段实现交接链完整追溯；正式定义调用方拒绝协议；`scripts/validate.sh` git hook；新 Agent 入职流程（IRON RULE #8）；评估场景从 8 扩展至 17；Darwin 评分 79.4 → 82.7 (planned) |
 | **4.0** | 2026-06-26 | 多Agent协作完整升级：YAML Frontmatter Schema + 三层记忆（wiki/agents/messages）+ Lane 状态机 + Git Trailers 协议 + 跨Agent 消息队列 + Wiki 知识提取；评估场景扩展至 8 个 |
 | **3.2** | 2026-06-24 | Darwin 进化：集中式失败 if-then 表 + 3 处工作流检查点 + frontmatter 优化，评分 74.5 → 79.4 |
 | **3.1** | 2026-06-24 | P0 强制触发（执行方必须写交接）+ 任务完成报告格式 + 调用方验证责任 + 空返回/失败处理 + 反模式更新 |
@@ -397,7 +445,7 @@ MIT License © 2026 AI Handover Contributors
 ---
 
 <div align="center">
-  <strong>AI 交接记录 · v4.1</strong> · IRON RULE 8 条强制合规 · Darwin 评分 82.7/100 · MIT License
+  <strong>AI 交接记录 · v4.1</strong> · IRON RULE 9 条强制合规 · Darwin 评分 82.7 (planned) · MIT License
   <br>
   <sub>Made for AI agents, by AI agents.</sub>
 </div>

@@ -69,11 +69,15 @@ def load_config(config_path: str | None) -> dict:
     if config_path:
         path = Path(config_path)
     else:
-        path = Path.cwd() / ".ai-handover.json"
-
-    if not path.exists():
-        print(f"ERROR: config file not found: {path}", file=sys.stderr)
-        sys.exit(1)
+        config_candidates = [".ai-handover.json", ".ai-handover/config.json"]
+        for candidate in config_candidates:
+            p = Path.cwd() / candidate
+            if p.exists():
+                path = p
+                break
+        else:
+            print(f"ERROR: config file not found (tried: {config_candidates})", file=sys.stderr)
+            sys.exit(1)
 
     with open(path, encoding="utf-8") as f:
         return json.load(f)
@@ -237,6 +241,9 @@ def main() -> None:
         success = False
         for channel, url in webhooks.items():
             if not url:
+                continue
+            if not url.startswith("http"):
+                print(f"WARNING: Skipping {channel}: invalid webhook URL", file=sys.stderr)
                 continue
             sender = SENDERS.get(channel)
             if sender and sender(url, payload):

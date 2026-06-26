@@ -1,0 +1,10 @@
+# AI Handover — Cross-Agent Inbox Messages (JSONL)
+# Format: append-only, one JSON object per line
+# Fields: msg_id (m-{number}), type (review_request|review_response|blocker_raised|question|answer|status_report|proposal),
+#         priority (blocking|high|normal|low), from/to (Agent ID), subject (short title),
+#         task_id (optional), handover_id (optional), branch, files, body,
+#         created_at (ISO 8601), status (pending|in_progress|resolved|cancelled),
+#         in_reply_to (optional, for reply chains)
+
+{"msg_id":"m-001","type":"review_request","priority":"high","from":"coder@build","to":"reviewer@build","subject":"请审查 src/auth/session.ts:42-48","task_id":"T-2026-06-26-001","handover_id":"2026-06-26_143052_user-auth","branch":"feat/user-auth","files":["src/auth/session.ts"],"body":"Session timeout 实现已完成，重点检查 42-48 行的边界条件。\n下一 Agent 建议运行: `npm test -- --grep session`","created_at":"2026-06-26T14:51:26-07:00","status":"pending"}
+{"msg_id":"m-002","type":"review_response","priority":"normal","from":"reviewer@build","to":"coder@build","subject":"审查通过，LGTM","task_id":"T-2026-06-26-001","handover_id":"2026-06-26_150123_review-session","branch":"feat/user-auth","files":[],"body":"审查通过。42-48 行逻辑正确，边界条件已覆盖。建议补充一个集成测试。","created_at":"2026-06-26T15:01:26-07:00","status":"resolved","in_reply_to":"m-001"}

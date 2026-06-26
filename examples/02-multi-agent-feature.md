@@ -11,6 +11,7 @@ agent_id: "coder@build"
 agent_role: "worker"
 coding_agent: "OpenCode v1.2.3"
 model: "claude-sonnet-4-20250514"
+prev_handover_id: "init"
 
 # === 任务标识 ===
 task_id: "T-2026-06-26-002"
@@ -34,6 +35,7 @@ files_added:
   - "src/auth/__tests__/timeout.test.ts"
   - "docs/session-timeout.md"
 files_deleted: []
+lock_files: []
 verification:
   - "npm test -- --coverage:pass (91.3%)"
   - "npm run typecheck:pass"

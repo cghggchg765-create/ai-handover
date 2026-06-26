@@ -1,16 +1,11 @@
 ---
-# 📁 模拟目录结构
-# AI交接记录/2026-06-26_143052_user-auth/
-# ├── 📄 执行记录.md    ← this file
-# ├── 📄 verification.log
-# └── 📄 messages.md    (空 — solo 模式无跨 Agent 消息)
-
 # === Agent 身份 ===
 handover_id: "2026-06-26_143052_user-auth"
 agent_id: "coder@build"
 agent_role: "worker"
 coding_agent: "OpenCode v1.2.3"
 model: "claude-sonnet-4-20250514"
+prev_handover_id: "init"
 
 # === 任务标识 ===
 task_id: "T-2026-06-26-001"
@@ -31,6 +26,7 @@ files_modified:
   - "src/auth/session.ts"
 files_added: []
 files_deleted: []
+lock_files: []
 verification:
   - "npm test -- --grep session:pass"
   - "npm run typecheck:pass"
@@ -41,7 +37,7 @@ risks:
   - level: "low"
     description: "Refresh token 过期时间从 7 天改为 3 天，已登录用户需重新认证"
 blockers: []
-next_action: "（无 — 单 Agent 完成，无需 review）"
+next_action: "@coder 单 Agent 完成，无需 review"
 confidence: "high"
 
 # === 通知 ===

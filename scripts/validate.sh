@@ -58,6 +58,7 @@ REQUIRED_FRONTMATTER=(
   "files_modified"
   "verification"
   "next_action"
+  "lock_files"
 )
 
 # Stale lock timeout in minutes
@@ -103,7 +104,7 @@ done
 # Determine target directory
 # ---------------------------------------------------------------------------
 if [ -z "$TARGET_DIR" ]; then
-  for candidate in "$PROJECT_ROOT/AI交接记录" "$PROJECT_ROOT/AI交接记录"; do
+  for candidate in "$PROJECT_ROOT/AI交接记录"; do
     if [ -d "$candidate" ]; then
       TARGET_DIR="$candidate"
       break
@@ -384,7 +385,7 @@ if [ -n "$HOT_MD" ] && git -C "$PROJECT_ROOT" rev-parse --git-dir > /dev/null 2>
     if [ "$HOT_MTIME" -gt "$LAST_COMMIT_TIME" ]; then
       pass "Check 7: hot.md has been modified since last commit"
     else
-      warn "Check 7: hot.md has NOT been modified since last commit (may need update)"
+      fail "Check 7: hot.md has NOT been modified since last commit (may need update)"
     fi
   else
     warn "Check 7: Could not determine modification times for hot.md"

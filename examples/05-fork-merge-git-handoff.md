@@ -10,6 +10,7 @@ agent_id: "coder@build"
 agent_role: "worker"
 coding_agent: "OpenCode v1.2.3"
 model: "claude-sonnet-4-20250514"
+prev_handover_id: "init"
 
 # === 任务标识 ===
 task_id: "T-2026-06-27-001"
@@ -21,38 +22,8 @@ handover_type: "handover"
 status: "resolved"
 previous_status: "ready-for-merge"
 branch: "agent-coder/feat-new-api"
-branch_lifecycle: "created → in-progress → needs-review → changes-requested → in-progress → needs-review → ready-for-merge → merged → deleted"
 commit: "a1b2c3d4e5f6"
 duration_s: 5400
-
-# === 分支生命周期 ===
-branch_events:
-  - event: "created"
-    at: "2026-06-27T07:00:00Z"
-    from: "main"
-    by: "coder@build"
-  - event: "work_started"
-    at: "2026-06-27T07:05:00Z"
-    by: "coder@build"
-  - event: "review_requested"
-    at: "2026-06-27T07:45:00Z"
-    by: "coder@build"
-  - event: "changes_requested"
-    at: "2026-06-27T07:52:00Z"
-    by: "reviewer@codex"
-  - event: "fixes_pushed"
-    at: "2026-06-27T08:10:00Z"
-    by: "coder@build"
-  - event: "approved"
-    at: "2026-06-27T08:15:00Z"
-    by: "reviewer@codex"
-  - event: "merged"
-    at: "2026-06-27T08:20:00Z"
-    by: "build@orchestrator"
-    merge_method: "squash"
-  - event: "deleted"
-    at: "2026-06-27T08:21:00Z"
-    by: "build@orchestrator"
 
 # === 变更证据 ===
 files_modified:
@@ -61,24 +32,12 @@ files_modified:
 files_added:
   - "src/api/__tests__/users.test.ts"
 files_deleted: []
+lock_files: []
 verification:
   - "npm test -- --coverage:pass (96%)"
   - "npm run typecheck:pass"
   - "npm run lint:pass"
   - "npm run build:pass"
-
-# === Review 记录 ===
-reviews:
-  - reviewer: "reviewer@codex"
-    requested_at: "2026-06-27T07:45:00Z"
-    completed_at: "2026-06-27T07:52:00Z"
-    verdict: "changes-requested"
-    summary: "2 issues: error handling missing on empty response, type widened unnecessarily"
-  - reviewer: "reviewer@codex"
-    requested_at: "2026-06-27T08:10:00Z"
-    completed_at: "2026-06-27T08:15:00Z"
-    verdict: "approved"
-    summary: "All issues resolved. LGTM."
 
 # === 风险与后续 ===
 risks:

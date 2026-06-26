@@ -15,6 +15,7 @@ agent_id: "coder-a@build"
 agent_role: "worker"
 coding_agent: "OpenCode v1.2.3"
 model: "claude-sonnet-4-20250514"
+prev_handover_id: "init"
 
 # === 任务标识 ===
 task_id: "T-2026-06-26-003"
@@ -41,16 +42,8 @@ verification:
   - "npm run typecheck:pass"
   - "npm run lint:pass"
 
-# === 并行协调 ===
-parallel_with:
-  - agent: "coder-b@build"
-    task_id: "T-2026-06-26-004"
-    branch: "agent-coder-b/fix-session-timeout"
-    files: ["src/auth/session.ts"]
-    status: "in-progress"
-
-# === 文件锁 ===
-file_locks:
+# === File Locks ===
+lock_files:
   - held_by: "coder-a@build"
     files:
       - "src/components/Login.tsx"
