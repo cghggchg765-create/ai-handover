@@ -43,41 +43,45 @@
 ```
 项目根目录/
 ├── AI交接记录/
-│   ├── 索引.md                         ← 时间倒序总览（自动更新）
-│   ├── 统计.md                         ← 全局统计
-│   ├── wiki/                           ← Layer 1: 持久知识
-│   │   ├── hot.md                      ← 热缓存（先读）
-│   │   ├── preferences.md              ← 用户偏好
-│   │   ├── patterns.md                 ← 跨项目模式
-│   │   ├── decisions.md                ← ADR 决策记录
-│   │   └── bugs.md                     ← 已知 bug
-│   ├── agents/                         ← Layer 2: 跨会话学习
-│   │   └── <agent_id>/
-│   │       ├── profile.md              ← Agent 人格 + 权威边界
-│   │       └── history.jsonl           ← 学习记录
-│   ├── messages/                       ← Layer 3: 实时协调
-│   │   ├── inbox.jsonl                 ← 待处理消息
-│   │   └── archive/                    ← 已处理归档
-│   ├── lanes/                          ← 状态机
-│   │   ├── active.md                   ← 当前活跃任务
-│   │   └── reviews.md                  ← Review 队列
-│   ├── rules/
-│   │   └── 05-git-coordination.md      ← Git 事件 ↔ Lane 状态映射
-│   └── <timestamp>_<task>/             ← 每次任务一个文件夹
-│       ├── 执行记录.md                 ← YAML frontmatter + Markdown
-│       ├── verification.log            ← 验证日志
-│       └── messages.md                 ← 消息记录
+│   ├── agents/                           ← Layer 2: 跨会话学习
+│   ├── lanes/                            ← 状态机
+│   ├── messages/
+│   │   └── archive/                      ← 已处理归档
+│   └── wiki/                             ← Layer 1: 持久知识
 ├── .ai-handover/
-│   ├── locks/                          ← 文件锁（IRON RULE #6 并行保护）
-│   ├── references/
-│   │   ├── templates/
-│   │   │   ├── software.md
-│   │   │   ├── academic.md
-│   │   │   ├── docs.md
-│   │   │   └── ops.md
-│   │   └── schemas/                    ← YAML Schema 定义
-│   └── validate.sh                     ← IRON RULE 合规校验脚本
-└── active.md                           ← 当前活跃任务列表（快捷入口）
+│   ├── config.json                       ← 运行时配置
+│   └── locks/                            ← 文件锁（IRON RULE #6 并行保护）
+├── examples/
+│   ├── 01-single-agent-fix.md
+│   ├── 02-multi-agent-feature.md
+│   ├── 03-cross-session-handoff.md
+│   ├── 04-parallel-agents-coordination.md
+│   ├── 05-fork-merge-git-handoff.md
+│   └── 06-cross-task-chain.md
+├── references/
+│   ├── schemas/
+│   │   └── handover.schema.json          ← YAML Schema 定义
+│   └── templates/                        ← 交接记录模板
+│       ├── academic.md
+│       ├── agents/
+│       ├── docs.md
+│       ├── exec-record.md
+│       ├── lanes/
+│       ├── locks/
+│       ├── messages/
+│       ├── ops.md
+│       ├── software.md
+│       └── wiki/
+├── rules/
+│   └── 05-git-coordination.md            ← Git 事件 ↔ Lane 状态映射
+├── scripts/
+│   ├── commit-with-trailers.sh           ← Git trailers 自动附加
+│   ├── message-relay.py                  ← 消息中继处理
+│   └── validate.sh                       ← IRON RULE 合规校验脚本
+├── README.md
+├── results.tsv
+├── SKILL.md
+└── test-prompts.json
 ```
 
 ---
@@ -96,7 +100,7 @@ cp scripts/validate.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
 # Step 3: 初始化项目交接目录
-mkdir -p AI交接记录/wiki AI交接记录/agents AI交接记录/messages/archive AI交接记录/lanes .ai-handover/locks .ai-handover/references/templates .ai-handover/references/schemas
+mkdir -p AI交接记录/wiki AI交接记录/agents AI交接记录/messages/archive AI交接记录/lanes .ai-handover/locks references/templates references/schemas
 touch AI交接记录/索引.md AI交接记录/lanes/active.md AI交接记录/lanes/reviews.md AI交接记录/messages/inbox.jsonl active.md
 ```
 

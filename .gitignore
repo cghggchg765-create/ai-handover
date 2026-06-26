@@ -1,0 +1,8 @@
+# ai-handover 运行时文件
+AI交接记录/
+.ai-handover/locks/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.log

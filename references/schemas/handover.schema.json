@@ -21,8 +21,8 @@
   "properties": {
     "handover_id": {
       "type": "string",
-      "pattern": "^\\d{8}_\\d{6}_.+$",
-      "description": "Format: YYYYMMDD_HHmmss_description"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}_\\d{6}_.+$",
+      "description": "Format: YYYY-MM-DD_HHmmss_description"
     },
     "prev_handover_id": {
       "type": "string",
@@ -59,6 +59,7 @@
     },
     "branch": {
       "type": "string",
+      "minLength": 1,
       "description": "Current git branch name (IRON RULE #2)"
     },
     "handover_type": {
@@ -78,6 +79,7 @@
     },
     "next_action": {
       "type": "string",
+      "pattern": "@[a-zA-Z_]+",
       "description": "Specifies the next agent's action (IRON RULE #2). e.g. '@reviewer please review src/auth/session.ts:42-48'"
     },
     "started_at": {
@@ -89,14 +91,6 @@
       "type": "string",
       "format": "date-time",
       "description": "ISO 8601 date-time string"
-    },
-    "parent_id": {
-      "type": "string",
-      "pattern": "^\\d{8}_\\d{6}_.+$",
-      "description": "Reference to parent handover_id for nested/sub-tasks"
-    },
-    "working_branch": {
-      "type": "string"
     },
     "files_modified": {
       "type": "array",
@@ -193,6 +187,47 @@
         "minLength": 1
       },
       "uniqueItems": true
+    },
+    "previous_status": {
+      "type": "string",
+      "description": "Previous lane status"
+    },
+    "commit": {
+      "type": "string",
+      "description": "Git commit hash"
+    },
+    "duration_s": {
+      "type": "integer",
+      "description": "Duration in seconds"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Task identifier"
+    },
+    "parent_plan": {
+      "type": "string",
+      "description": "Parent plan reference"
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Blocking issues"
+    },
+    "files_added": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "New files"
+    },
+    "files_deleted": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Deleted files"
     }
   },
   "additionalProperties": false

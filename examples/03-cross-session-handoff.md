@@ -27,7 +27,7 @@ handover_type: "handover"
 prev_handover_id: "2026-06-26_090000_explore-oidc,2026-06-27_140000_research-oidc"
 
 # === 状态机 ===
-status: "completed"
+status: resolved
 previous_status: "in-progress"
 branch: "feat/oidc-integration"
 commit: "d9e8f7c6b5a4"
@@ -58,7 +58,7 @@ risks:
   - level: "low"
     description: "Google 登录回退策略尚未在 staging 测试"
 blockers: []
-next_action: "部署 staging 后执行集成测试"
+next_action: "@reviewer 部署 staging 后执行集成测试"
 confidence: "high"
 
 # === 通知 ===

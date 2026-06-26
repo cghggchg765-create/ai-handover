@@ -44,7 +44,7 @@ risks:
   - level: "low"
     description: "新 API endpoint 尚未在 staging 环境验证"
 blockers: []
-next_action: "部署 staging 后验证新 endpoint"
+next_action: "@ops 部署 staging 后验证新 endpoint"
 confidence: "high"
 
 # === 时间戳 ===

@@ -33,6 +33,13 @@ TARGET_DIR=""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Guard: require bash =4.0 for associative arrays
+if ! declare -A _ &>/dev/null 2>&1; then
+    echo "ERROR: bash =4.0 required. Current version: $BASH_VERSION" >&2
+    echo "  macOS: brew install bash" >&2
+    exit 1
+fi
+
 # Legal lane transitions (status -> allowed next statuses)
 declare -A LEGAL_TRANSITIONS
 LEGAL_TRANSITIONS=(
@@ -156,7 +163,7 @@ if [ -n "$INDEX_FILE" ]; then
   fi
 
   # Extract referenced handover folder names
-  REFERENCED_FOLDERS=$(grep -oE '\b[0-9]{8}_[0-9]{6}_[^/ )]+' "$INDEX_FILE" 2>/dev/null || true)
+  REFERENCED_FOLDERS=$(grep -oE '(^|[^a-zA-Z0-9_])[0-9]{8}_[0-9]{6}_[^/ )]+' "$INDEX_FILE" 2>/dev/null || true)
 
   MISSING_FOLDERS=()
   for folder in $REFERENCED_FOLDERS; do
@@ -302,7 +309,7 @@ $VERBOSE && log "--- Check 5: Lane status transitions ---"
 SORTED_FOLDERS=()
 while IFS= read -r -d '' d; do
   SORTED_FOLDERS+=("$(basename "$d")")
-done < <(find "$TARGET_DIR" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort -z)
+done < <(find "$TARGET_DIR" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort)
 
 TRANSITIONS_OK=true
 PREV_STATUS=""

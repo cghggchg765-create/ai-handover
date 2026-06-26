@@ -20,14 +20,14 @@ model: "claude-sonnet-4-20250514"
 # === 任务标识 ===
 task_id: "T-2026-06-28-005"
 parent_plan: "plans/2026-06-28_auth-module-plan.md"
-task_type: "test"
+task_type: feature
 handover_type: "handover"
 
 # === 链 — 跨任务引用（IRON RULE #4）===
 prev_handover_id: "2026-06-28_080000_init-project,2026-06-28_083000_impl-auth,2026-06-28_090000_review-auth,2026-06-28_093000_fix-auth"
 
 # === 状态机 ===
-status: "completed"
+status: resolved
 previous_status: "in-progress"
 branch: "feat/auth-module"
 commit: "f1e2d3c4b5a6"
@@ -53,7 +53,7 @@ risks:
   - level: "low"
     description: "集成测试依赖外部 mock server，CI 中需确认 mock 可用"
 blockers: []
-next_action: "所有测试通过，auth 模块功能完整。下一阶段：通知 human:zhang 部署窗口"
+next_action: "@fixer 所有测试通过，auth 模块功能完整。下一阶段：通知 human:zhang 部署窗口"
 confidence: "high"
 
 # === 时间戳 ===

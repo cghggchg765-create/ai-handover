@@ -11,10 +11,10 @@ prev_handover_id: "init"
 task_id: "T-2026-06-26-001"
 parent_plan: ""
 task_type: "fix"
-handover_type: "task_complete"
+handover_type: handover
 
 # === 状态机 ===
-status: "completed"
+status: resolved
 previous_status: "in-progress"
 branch: "fix/token-refresh"
 commit: "f7e8d9c1a2b3"
