@@ -73,7 +73,12 @@
 │       ├── software.md
 │       └── wiki/
 ├── rules/
-│   └── 05-git-coordination.md            ← Git 事件 ↔ Lane 状态映射
+│   ├── 00-core.md                          ← P0 铁律系统（9 条 IRON RULE）
+│   ├── 01-handover.md                      ← YAML Frontmatter 与执行记录规范
+│   ├── 02-coordination.md                  ← 多 Agent 协调（串行/并行/状态机）
+│   ├── 03-git.md                           ← Git 同步（分支/trailers/恢复协议）
+│   ├── 04-validation.md                    ← 验证规则（8 项检查/schema）
+│   └── 05-memory.md                        ← 三层记忆（wiki/agents/messages）
 ├── scripts/
 │   ├── commit-with-trailers.sh           ← Git trailers 自动附加
 │   ├── message-relay.py                  ← 消息中继处理
