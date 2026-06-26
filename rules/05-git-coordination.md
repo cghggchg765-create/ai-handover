@@ -3,7 +3,7 @@ metadata:
   title: Git Coordination Specification
   version: 1.0.0
   component: ai-handover
-  status: draft
+  status: active
   valid_at: 2026-06-26
   provenance: "ai-handover v4.1 — Git 作为 AI 协作协调层"
   dependencies:
@@ -190,7 +190,7 @@ Co-authored-by: AI <ai@example.com>
 
 ```bash
 #!/usr/bin/env bash
-# validate-git-trailers.sh — 校验 commit trailers 合规
+# validate.sh — 校验 commit trailers 合规
 
 COMMIT_MSG_FILE="${1:-/dev/stdin}"
 errors=0
@@ -222,7 +222,7 @@ fi
 exit $errors
 ```
 
-**CI 集成**：将 `validate-git-trailers.sh` 加入 CI pipeline，PR 未通过则不可合并。
+**CI 集成**：将 `scripts/validate.sh` 加入 CI pipeline，PR 未通过则不可合并。
 
 ---
 

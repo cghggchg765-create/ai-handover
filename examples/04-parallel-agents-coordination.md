@@ -44,18 +44,8 @@ verification:
 
 # === File Locks ===
 lock_files:
-  - held_by: "coder-a@build"
-    files:
-      - "src/components/Login.tsx"
-      - "src/components/LoginForm.tsx"
-      - "src/styles/login.css"
-    since: "2026-06-26T07:30:00Z"
-    status: "in_progress"
-  - held_by: "coder-b@build"
-    files:
-      - "src/auth/session.ts"
-    since: "2026-06-26T07:32:00Z"
-    status: "in_progress"
+  - "src/components/Login.tsx"
+  - "src/auth/session.ts"
 
 # === 风险与后续 ===
 risks:

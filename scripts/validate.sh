@@ -35,7 +35,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Guard: require bash =4.0 for associative arrays
 if ! declare -A _ &>/dev/null 2>&1; then
-    echo "ERROR: bash =4.0 required. Current version: $BASH_VERSION" >&2
+    echo "ERROR: bash >=4.0 required. Current version: $BASH_VERSION" >&2
     echo "  macOS: brew install bash" >&2
     exit 1
 fi
@@ -163,7 +163,7 @@ if [ -n "$INDEX_FILE" ]; then
   fi
 
   # Extract referenced handover folder names
-  REFERENCED_FOLDERS=$(grep -oE '(^|[^a-zA-Z0-9_])[0-9]{8}_[0-9]{6}_[^/ )]+' "$INDEX_FILE" 2>/dev/null || true)
+  REFERENCED_FOLDERS=$(grep -oE '(^|[^a-zA-Z0-9_])[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{6}_[^/ )]+' "$INDEX_FILE" 2>/dev/null || true)
 
   MISSING_FOLDERS=()
   for folder in $REFERENCED_FOLDERS; do

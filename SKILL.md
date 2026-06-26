@@ -23,9 +23,9 @@ version: 4.1
 2. [IRON RULE 系统（强制合规）](#-iron-rule-系统强制合规)
 3. [YAML Frontmatter Schema — 机器可解析](#-yaml-frontmatter-schema--机器可解析)
 4. [三层记忆架构](#-三层记忆架构)
-    - 3.1 [Wiki 层 — User Memory（显式知识）](#31-wiki-层--user-memory显式知识)
-    - 3.2 [Agent 层 — Agent Memory（学习沉淀）](#32-agent-层--agent-memory学习沉淀)
-    - 3.3 [Messages 层 — Cross-Agent 消息](#33-messages-层--cross-agent-消息)
+    - 3.1 [Wiki 层 — User Memory（显式知识）](#31-wiki-层-user-memory显式知识)
+    - 3.2 [Agent 层 — Agent Memory（学习沉淀）](#32-agent-层-agent-memory学习沉淀)
+    - 3.3 [Messages 层 — Cross-Agent 消息](#33-messages-层-cross-agent-消息)
 5. [跨任务交接链](#-跨任务交接链)
 6. [Lane 状态机](#-lane-状态机)
 7. [并行 Agent 协调](#-并行-agent-协调)
@@ -298,7 +298,7 @@ ended_at: 2026-06-26T14:51:26-07:00
 
 ## 🧠 三层记忆架构
 
-v4.0 引入三层记忆（借鉴 memwiki + mem0 + agent-work-mem），区分"显式知识"、"学习和沉淀"、"实时消息"。
+v4.1 引入三层记忆（借鉴 memwiki + mem0 + agent-work-mem），区分"显式知识"、"学习和沉淀"、"实时消息"。
 
 ```
 AI交接记录/
@@ -687,7 +687,7 @@ updated_at: 2026-06-26T15:00:00-07:00
 | 修改完成 | 删除 lock.json | 不释放锁 → >30min 自动标记 warn |
 | 死锁检测 | >30min 无 heartbeat | 标记 stale，通知调用方 |
 
-### 6.2 分支策略强制（IRON RULE #9）
+### IRON RULE #9: 分支策略强制
 
 🔴 **并行任务必须使用独立分支。** 每个并行 Agent 必须在独立分支上完成工作。
 
@@ -770,7 +770,7 @@ ls .ai-handover/locks/
 
 ## 🧬 Git Trailers 协议
 
-v4.0 引入结构化 commit trailers（参考 Lore 论文 arXiv 2603.15566 + oh-my-claudecode + fabiorehm），使 **git log 成为 Agent 决策的可审计来源**。
+v4.1 引入结构化 commit trailers（参考 Lore 论文 arXiv 2603.15566 + oh-my-claudecode + fabiorehm），使 **git log 成为 Agent 决策的可审计来源**。
 
 ### 标准 Trailers
 
@@ -779,7 +779,7 @@ feat(auth): add session timeout
 
 Implement 30-min idle session timeout to match security policy SEC-2024-12.
 
-# === 标准 AI Trailers (ai-handover v4.0) ===
+# === 标准 AI Trailers (ai-handover v4.1) ===
 Handover-Id: 2026-06-26_143052_user-auth
 Coding-Agent: OpenCode v1.2.3
 Model: claude-opus-4-6
@@ -845,7 +845,7 @@ Confidence: high"
 
 ## 🎛️ 参数系统
 
-v4.0 保留原有参数，新增 `coordination` 参数。
+v4.1 保留原有参数，新增 `coordination` 参数。
 
 | 参数 | 说明 | 默认值 | 可选值 |
 |------|------|:------:|--------|
@@ -864,7 +864,7 @@ v4.0 保留原有参数，新增 `coordination` 参数。
 
 ## 🧠 智能识别
 
-本技能会自动从自然语言中推断参数，无需用户显式指定。v4.0 新增多 Agent 识别：
+本技能会自动从自然语言中推断参数，无需用户显式指定。v4.1 新增多 Agent 识别：
 
 | 用户表述 | 推断参数 |
 |---------|---------|
@@ -882,7 +882,7 @@ v4.0 保留原有参数，新增 `coordination` 参数。
 
 ## 📊 模块选择矩阵
 
-v4.0 新增多 Agent 协作模块：
+v4.1 新增多 Agent 协作模块：
 
 | 模块 | handover | progress | decision | summary | minimal | multi-agent |
 |------|:--------:|:--------:|:--------:|:-------:|:-------:|:-----------:|
@@ -946,6 +946,15 @@ v4.0 新增多 Agent 协作模块：
 | `lanes/state.md` | Lane 状态机 + SLA |
 | `lanes/active.md` | 当前活跃任务 |
 | `lanes/reviews.md` | Review 队列 |
+| `lanes/dependencies.md` | 依赖图 |
+
+---
+
+### Locks 层模板
+
+| 模板 | 适用 |
+|------|------|
+| `locks/lock.json` | 文件锁格式 |
 
 ---
 
@@ -988,7 +997,7 @@ AI交接记录/YYYY-MM-DD_HHmmss_任务简述/
 
 ### 第三步：编写执行记录（YAML Frontmatter + Markdown 正文）
 
-参考 [YAML Frontmatter Schema](#-yaml-frontmatter-schema--机器可解析) 填写。
+参考 [YAML Frontmatter Schema](#yaml-frontmatter-schema-机器可解析) 填写。
 
 > 🔴 CHECKPOINT: 执行记录写入后，立即检查：
 > - YAML frontmatter 是否包含所有必填字段（handover_id / prev_handover_id / agent_id / agent_role / coding_agent / model / status / branch / files_modified / verification / next_action / lock_files）
@@ -1067,11 +1076,13 @@ Confidence: <level>"
 | 8 | 下步计划可执行 | 下一步计划是具体动作，非空泛描述 |
 | 9 | Git commit（可选） | 含标准 trailers |
 
+> 💡 亦可运行 `scripts/validate.sh` 自动验证所有检查项。
+
 ---
 
 ## 🔔 Slack/Discord 消息中继（可选）
 
-v4.0 支持将 `messages/inbox.jsonl` 中的消息通过 webhook 推送到 Slack 或 Discord。
+v4.1 支持将 `messages/inbox.jsonl` 中的消息通过 webhook 推送到 Slack 或 Discord。
 
 ### 配置方式
 
@@ -1196,7 +1207,7 @@ v4.0 支持将 `messages/inbox.jsonl` 中的消息通过 webhook 推送到 Slack
 
 | 版本 | 日期 | 变更 |
 |:----:|:----:|:-----|
-| **4.1** | 2026-06-26 | **IRON RULE 强制合规系统**：9 条铁律（强制写交接/模板格式/git trailers/交接链/状态门控/文件锁/hot.md 更新/入职流程）+ 调用方拒绝协议 + 跨任务交接链 + 串行验证门控 + 并行 Agent 协调（文件锁/分支策略/依赖图）+ Git 事件 ↔ Lane 状态映射 + scripts/validate.sh 增强（4→8 项）+ 12 条新反模式 |
+| **4.1** | 2026-06-26 | **IRON RULE 强制合规系统**：9 条铁律（强制写交接/模板格式/git trailers/交接链/状态门控/文件锁/hot.md 更新/入职流程/分支策略）+ 调用方拒绝协议 + 跨任务交接链 + 串行验证门控 + 并行 Agent 协调（文件锁/分支策略/依赖图）+ Git 事件 ↔ Lane 状态映射 + scripts/validate.sh 增强（4→8 项）+ 12 条新反模式 + `prev_handover_id` 字段 + 评估场景从 8 扩展至 17 + Darwin 评分 79.4 → 82.7 (planned) |
 | **4.0** | 2026-06-26 | **多 Agent 协作完整升级**：YAML Frontmatter Schema + 三层记忆（wiki/agents/messages）+ Lane 状态机 + Git Trailers 协议 + Slack/Discord 消息中继 + 新增 15+ 模板 + 升级所有执行流程 |
 | **3.2** | 2026-06-24 | Darwin 进化：集中式失败 if-then 表 + 3 处工作流检查点 + frontmatter 优化，评分 74.5 → 79.4 |
 | **3.1** | 2026-06-24 | P0 强制触发（执行方必须写交接）+ 任务完成报告格式 + 调用方验证责任 + 空返回/失败处理 + 反模式更新 |

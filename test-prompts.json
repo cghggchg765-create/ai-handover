@@ -47,7 +47,7 @@
   {
     "id": 10,
     "prompt": "我写了一份AI交接记录，YAML frontmatter中只有handover_id和status两个字段，缺少agent_id、agent_role、coding_agent、model、branch、files_modified、verification、lock_files、next_action等必填字段。这份记录能被接受吗？",
-    "expected": "IRON RULE #2 触发：调用方拒绝接受，列出缺失的必填字段（agent_id、agent_role、coding_agent、model、branch、files_modified、verification、lock_files、next_action），责令按照YAML Schema模板重写。重写完成后才可标记任务完成。"
+    "expected": "IRON RULE #2 触发：调用方拒绝接受，列出缺失的必填字段（prev_handover_id、agent_id、agent_role、coding_agent、model、branch、files_modified、verification、lock_files、next_action），责令按照YAML Schema模板重写。重写完成后才可标记任务完成。"
   },
   {
     "id": 11,

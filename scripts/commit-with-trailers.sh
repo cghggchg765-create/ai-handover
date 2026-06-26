@@ -8,7 +8,7 @@
 # Usage:
 #   ./commit-with-trailers.sh \
 #       --message "feat: implement retry logic" \
-#       --handover-id "20260625_143022_add-retry" \
+#       --handover-id "2026-06-25_143022_add-retry" \
 #       --coding-agent "coder-milo" \
 #       --model "gpt-4o" \
 #       [--constraint "no-external-deps"] \
@@ -33,7 +33,7 @@
 # Examples:
 #   ./commit-with-trailers.sh \
 #       --message "refactor: extract auth middleware" \
-#       --handover-id "20260625_102030_refactor-auth" \
+#       --handover-id "2026-06-25_102030_refactor-auth" \
 #       --coding-agent "coder-zeta" \
 #       --model "claude-sonnet-4" \
 #       --constraint "backward-compat" \
@@ -130,6 +130,6 @@ if [ -n "$CONFIDENCE" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Create commit with heredoc body
+# Create commit with body via -m flags
 # ---------------------------------------------------------------------------
 git commit -m "$MESSAGE" -m "$TRAILERS"

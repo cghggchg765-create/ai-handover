@@ -79,7 +79,7 @@
     },
     "next_action": {
       "type": "string",
-      "pattern": "@[a-zA-Z_]+",
+      "pattern": "@[a-zA-Z_][a-zA-Z0-9_]*",
       "description": "Specifies the next agent's action (IRON RULE #2). e.g. '@reviewer please review src/auth/session.ts:42-48'"
     },
     "started_at": {

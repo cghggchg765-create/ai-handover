@@ -83,6 +83,7 @@
 ├── SKILL.md
 └── test-prompts.json
 ```
+> 📌 `AI交接记录/` 目录及内部文件由 AI agent 在首次任务完成后自动创建。也可手动运行初始化脚本。
 
 ---
 
@@ -101,8 +102,9 @@ chmod +x .git/hooks/pre-commit
 
 # Step 3: 初始化项目交接目录
 mkdir -p AI交接记录/wiki AI交接记录/agents AI交接记录/messages/archive AI交接记录/lanes .ai-handover/locks references/templates references/schemas
-touch AI交接记录/索引.md AI交接记录/lanes/active.md AI交接记录/lanes/reviews.md AI交接记录/messages/inbox.jsonl active.md
+touch AI交接记录/索引.md AI交接记录/lanes/active.md AI交接记录/lanes/reviews.md AI交接记录/messages/inbox.jsonl
 ```
+> 💡 Windows 用户：使用 Git Bash 或 WSL 运行上述命令。PowerShell 用户可将 `cp -r` 替换为 `Copy-Item -Recurse`，`chmod +x` 可跳过。
 
 ### 30 秒使用
 
@@ -344,7 +346,7 @@ rm .ai-handover/locks/src-config-yaml.json
 | Round 1 | 78.7 | +4.2 | 集中式失败 if-then 表 + 3 处工作流显式检查点 |
 | Round 2 | 79.4 | +0.7 | 精简 frontmatter + 版本号一致性修复 |
 | **v4.0** | **79.4** | **—** | **YAML结构 + 三层记忆 + Lane状态机 + Git Trailers + 多Agent消息协议** |
-| **v4.1** | **82.7 (planned)** | **+3.3** | **IRON RULE系统 + 文件锁 + validate.sh + 分支策略 + 扩展评估集至17场景** |
+| **v4.1** | **82.7 (planned)** | **+3.3** | **IRON RULE系统 + 文件锁 + validate.sh + 分支策略 + 跨任务交接链 + Git 事件 ↔ Lane 状态映射 + 12 条新反模式 + 扩展评估集至17场景** |
 
 > **Note**: v4.1 Darwin 评分 82.7 为计划目标（planned target）。当前处于评估阶段，最终分数以实际 Darwin 评测结果为准。9 维度评分反映设计目标，非实测数据。
 
@@ -428,7 +430,7 @@ rm .ai-handover/locks/src-config-yaml.json
 
 | 版本 | 日期 | 变更 |
 |:----:|:----:|:-----|
-| **4.1** | 2026-06-26 | **IRON RULE 系统升级**：9 条不可协商的 P0 铁律（#1 强制写交接 / #2 模板格式 / #3 git trailers / #4 交接链 / #5 状态门控 / #6 文件锁 / #7 hot.md 更新 / #8 入职流程 / #9 分支策略）；validate.sh 合规校验脚本（trailer 检查 + 状态机校验 + 分支名检查）；`.ai-handover/locks/` 文件锁机制支持并行 Agent 安全写入；`prev_handover_id` 字段实现交接链完整追溯；正式定义调用方拒绝协议；`scripts/validate.sh` git hook；新 Agent 入职流程（IRON RULE #8）；评估场景从 8 扩展至 17；Darwin 评分 79.4 → 82.7 (planned) |
+| **4.1** | 2026-06-26 | **IRON RULE 系统升级**：9 条不可协商的 P0 铁律（#1 强制写交接 / #2 模板格式 / #3 git trailers / #4 交接链 / #5 状态门控 / #6 文件锁 / #7 hot.md 更新 / #8 入职流程 / #9 分支策略）；validate.sh 合规校验脚本（trailer 检查 + 状态机校验 + 分支名检查）；`.ai-handover/locks/` 文件锁机制支持并行 Agent 安全写入；`prev_handover_id` 字段实现交接链完整追溯；正式定义调用方拒绝协议；跨任务交接链与串行验证门控；并行 Agent 协调（依赖图）；Git 事件 ↔ Lane 状态映射；新 Agent 入职流程（IRON RULE #8）；新增 12 条反模式；评估场景从 8 扩展至 17；Darwin 评分 79.4 → 82.7 (planned) |
 | **4.0** | 2026-06-26 | 多Agent协作完整升级：YAML Frontmatter Schema + 三层记忆（wiki/agents/messages）+ Lane 状态机 + Git Trailers 协议 + 跨Agent 消息队列 + Wiki 知识提取；评估场景扩展至 8 个 |
 | **3.2** | 2026-06-24 | Darwin 进化：集中式失败 if-then 表 + 3 处工作流检查点 + frontmatter 优化，评分 74.5 → 79.4 |
 | **3.1** | 2026-06-24 | P0 强制触发（执行方必须写交接）+ 任务完成报告格式 + 调用方验证责任 + 空返回/失败处理 + 反模式更新 |

@@ -46,7 +46,7 @@ files_added:
 files_deleted: []
 lock_files: []
 verification:
-  - "npm test -- --coverage:pass (94.2%)"
+  - "npm test -- --coverage:pass"
   - "npm run typecheck:pass"
   - "npm run lint:pass"
   - "npm run integration:oidc:pass"
@@ -253,7 +253,7 @@ updated_by: researcher@gpt
 | 1 | 新增 | `src/auth/providers/azure.ts` | Azure AD OIDC 策略配置（依赖 Session 2 的 tenant 配置技巧）|
 | 2 | 新增 | `src/auth/providers/google.ts` | Google OIDC 策略配置 |
 | 3 | 修改 | `src/auth/sso.ts` | 实现 SSO router：`/auth/sso/azure`、`/auth/sso/google`、`/auth/sso/callback` |
-| 4 | 修改 | `src/auth/login.ts` | 集成 OIDC 登录结果到现有 Toke n 签发流程 |
+| 4 | 修改 | `src/auth/login.ts` | 集成 OIDC 登录结果到现有 Token 签发流程 |
 | 5 | 新增 | `config/oidc.yml` | OIDC 环境配置模板 |
 | 6 | 新增 | `src/auth/__tests__/oidc.test.ts` | Mock IDP + callback 测试 |
 | 7 | 修改 | `package.json` | 新增 `passport-azure-ad`、`passport-google-oidc`、`openid-client` |

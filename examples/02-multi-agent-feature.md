@@ -37,7 +37,7 @@ files_added:
 files_deleted: []
 lock_files: []
 verification:
-  - "npm test -- --coverage:pass (91.3%)"
+  - "npm test -- --coverage:pass"
   - "npm run typecheck:pass"
   - "npm run lint:pass"
   - "npm run build:pass"
@@ -49,12 +49,13 @@ risks:
   - level: "low"
     description: "新增 idle-timeout 事件未在现有 WebSocket 重连逻辑中测试"
 blockers: []
+confidence: "high"
 next_action: "@reviewer please review src/auth/session.ts:42-48, src/auth/login.ts:105-120, src/middleware/session.ts:30-65"
 
 # === 通知 ===
 notify:
   - to: "@reviewer"
-    via: "lane"
+    via: "inbox"
     message: "T-2026-06-26-002 session-timeout feature ready for review — 3 files, 91.3% coverage"
   - to: "human:zhang"
     via: "slack"

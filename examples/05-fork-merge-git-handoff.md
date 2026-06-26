@@ -34,7 +34,7 @@ files_added:
 files_deleted: []
 lock_files: []
 verification:
-  - "npm test -- --coverage:pass (96%)"
+  - "npm test -- --coverage:pass"
   - "npm run typecheck:pass"
   - "npm run lint:pass"
   - "npm run build:pass"
